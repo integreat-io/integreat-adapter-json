@@ -69,6 +69,11 @@ export default {
     return { ...options, uri }
   },
 
+  /**
+   * Connect to service.
+   * For the json adapter, this will only return the connection object –
+   * whatever it is.
+   */
   connect: async (_serviceOptions: Options, _auth: object | null, connection: object | null) => connection,
 
   /**
@@ -91,12 +96,16 @@ export default {
    * If an auth object is provided, it is expected to be in the form of http
    * headers and added to the request's headers.
    */
-  async send ({ endpoint, data = null, auth, params = {} }: Request): Promise<Response> {
+  async send ({ endpoint, data, auth, params = {} }: Request): Promise<Response> {
     if (!endpoint) {
       return { status: 'error', error: 'No endpoint specified in the request' }
     }
 
-    if (typeof data !== 'string' && data !== null) {
+    if (data === null || data === '') {
+      data = undefined
+    }
+
+    if (typeof data !== 'string' && typeof data !== 'undefined') {
       return { status: 'badrequest', error: 'Request data is not valid JSON' }
     }
 
@@ -122,16 +131,23 @@ export default {
    * Returns the response parsed from a JSON string.
    */
   async normalize (response: Response, _request: Request): Promise<Response> {
-    const { data = null } = response
+    const data = (typeof response.data === 'undefined' || response.data === '')
+      ? null
+      : response.data
+
     try {
       return {
         ...response,
-        data: (typeof data !== 'object') ? JSON.parse(data) : data || null
+        data: (typeof data !== 'object') ? JSON.parse(data) : data
       }
     } catch (error) {
       return { status: 'badresponse', error: 'Response data is not valid JSON' }
     }
   },
 
+  /**
+   * Disconnect from service.
+   * For the json adapter, this will do nothing.
+   */
   disconnect: async (_connection: {} | null) => { return }
 }

@@ -38,6 +38,15 @@ test('should normalize undefined as null', async (t) => {
   t.deepEqual(ret, expected)
 })
 
+test('should normalize empty string as null', async (t) => {
+  const response = { status: 'ok', data: '' }
+  const expected = { status: 'ok', data: null }
+
+  const ret = await adapter.normalize(response, request)
+
+  t.deepEqual(ret, expected)
+})
+
 test('should not touch data object when already parsed', async (t) => {
   const response = {
     status: 'ok',

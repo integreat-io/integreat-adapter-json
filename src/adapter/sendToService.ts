@@ -4,7 +4,7 @@ import { Headers } from '.'
 interface SendOptions {
   uri: string,
   method: string,
-  data?: string | null,
+  data?: string,
   headers: Headers | {},
   auth?: object | boolean | null
 }
@@ -44,7 +44,7 @@ export default async function sendToService (sendOptions: SendOptions) {
   try {
     const response = await got(uri, {
       method,
-      body: data || undefined,
+      body: data,
       headers
     })
     return { status: 'ok', data: response.body }
