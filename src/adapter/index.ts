@@ -35,18 +35,28 @@ export interface Options {
   baseUri?: string | null,
   uri?: string,
   headers?: Headers | {},
-  method?: string
+  method?: string,
+  retries?: number
 }
 
 export interface CompiledOptions {
   baseUri?: string | null,
   uri: (string | object)[],
   headers?: Headers | {},
-  method?: string
+  method?: string,
+  retries?: number
 }
 
 const selectMethod = (endpoint: CompiledOptions, data?: string | RequestData) =>
   endpoint.method || ((data) ? 'PUT' : 'GET')
+
+const isValidData = (data?: string | RequestData): data is (string | undefined) =>
+  typeof data === 'string' || typeof data === 'undefined'
+
+const createHeaders = (endpoint: CompiledOptions, auth?: object | boolean | null) => ({
+  ...endpoint.headers,
+  ...((auth === true) ? {} : auth)
+})
 
 export default {
   authentication: 'asHttpHeaders',
@@ -105,16 +115,14 @@ export default {
       data = undefined
     }
 
-    if (typeof data !== 'string' && typeof data !== 'undefined') {
+    if (!isValidData(data)) {
       return { status: 'badrequest', error: 'Request data is not valid JSON' }
     }
 
     const uri = generateUri(endpoint.uri, params)
     const method = selectMethod(endpoint, data)
-    const headers = {
-      ...endpoint.headers,
-      ...((auth === true) ? {} : auth)
-    }
+    const retries = endpoint.retries || 0
+    const headers = createHeaders(endpoint, auth)
 
     if (params.dryrun) {
       return {
@@ -123,7 +131,7 @@ export default {
       }
     }
 
-    return sendToService({ uri, method, data, headers, auth })
+    return sendToService({ uri, method, data, headers, auth, retries })
   },
 
   /**

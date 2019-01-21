@@ -18,7 +18,10 @@ test('should send data and return status', async (t) => {
     .reply(200, { id: 'ent1' })
   const request = {
     method: 'MUTATION',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json1.test/entries/ent1' }),
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json1.test/entries/ent1',
+      retries: 0
+    }),
     data
   }
 
@@ -115,17 +118,17 @@ test('should return error on not found', async (t) => {
 
 test('should return error on other error', async (t) => {
   nock('http://json7.test')
-    .get('/entries/forbidden')
-    .reply(403)
+    .get('/entries/error')
+    .reply(500)
   const request = {
     method: 'QUERY',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json7.test/entries/forbidden' })
+    endpoint: adapter.prepareEndpoint({ uri: 'http://json7.test/entries/error' })
   }
 
   const ret = await adapter.send(request)
 
   t.is(ret.status, 'error')
-  t.is(ret.error, 'Server returned 403 for http://json7.test/entries/forbidden')
+  t.is(ret.error, 'Server returned 500 for http://json7.test/entries/error')
   t.is(typeof ret.data, 'undefined')
 })
 
@@ -205,6 +208,40 @@ test('should not throw when auth=true', async (t) => {
   t.is(ret.status, 'ok')
 })
 
+test('should respond with badrequest on 400', async (t) => {
+  nock('http://json14.test')
+    .put('/entries/ent1', '{}')
+    .reply(400, {})
+  const request = {
+    method: 'MUTATION',
+    endpoint: adapter.prepareEndpoint({ uri: 'http://json14.test/entries/ent1' }),
+    data: '{}',
+    auth: {}
+  }
+
+  const ret = await adapter.send(request)
+
+  t.is(ret.status, 'badrequest')
+  t.is(typeof ret.error, 'string')
+})
+
+test('should respond with timeout on 408', async (t) => {
+  nock('http://json15.test')
+    .put('/entries/ent1', '{}')
+    .reply(408, {})
+  const request = {
+    method: 'MUTATION',
+    endpoint: adapter.prepareEndpoint({ uri: 'http://json15.test/entries/ent1' }),
+    data: '{}',
+    auth: {}
+  }
+
+  const ret = await adapter.send(request)
+
+  t.is(ret.status, 'timeout')
+  t.is(typeof ret.error, 'string')
+})
+
 test('should reject on 401 with auth', async (t) => {
   nock('http://json12.test')
     .put('/entries/ent1', '{}')
@@ -229,6 +266,23 @@ test('should reject on 401 without auth', async (t) => {
   const request = {
     method: 'MUTATION',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json13.test/entries/ent1' }),
+    data: '{}',
+    auth: null
+  }
+
+  const ret = await adapter.send(request)
+
+  t.is(ret.status, 'noaccess')
+  t.is(typeof ret.error, 'string')
+})
+
+test('should reject on 403 ', async (t) => {
+  nock('http://json16.test')
+    .put('/entries/ent1', '{}')
+    .reply(403, {})
+  const request = {
+    method: 'MUTATION',
+    endpoint: adapter.prepareEndpoint({ uri: 'http://json16.test/entries/ent1' }),
     data: '{}',
     auth: null
   }
