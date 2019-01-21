@@ -13,7 +13,7 @@ test.after(() => {
 
 test('should send data and return status', async (t) => {
   const data = '{"id":"ent1","title":"Entry 1"}'
-  const scope = nock('http://json1.test')
+  const scope = nock('http://json1.test', { reqheaders: { 'Content-Type': 'application/json' } })
     .put('/entries/ent1', data)
     .reply(200, { id: 'ent1' })
   const request = {
@@ -322,7 +322,9 @@ test('should return request props on dry-run', async (t) => {
     uri: 'http://json0.test/entries/ent1',
     method: 'PUT',
     body: data,
-    headers: {}
+    headers: {
+      'Content-Type': 'application/json'
+    }
   }
 
   const ret = await adapter.send(request)

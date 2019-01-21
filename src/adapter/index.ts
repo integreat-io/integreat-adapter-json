@@ -54,6 +54,7 @@ const isValidData = (data?: string | RequestData): data is (string | undefined) 
   typeof data === 'string' || typeof data === 'undefined'
 
 const createHeaders = (endpoint: CompiledOptions, auth?: object | boolean | null) => ({
+  'Content-Type': 'application/json',
   ...endpoint.headers,
   ...((auth === true) ? {} : auth)
 })
