@@ -1,3 +1,4 @@
+const debug = require('debug')('great:adapter:json')
 import { compile as compileUri, generate as generateUri } from 'great-uri-template'
 import sendToService from './sendToService'
 
@@ -124,6 +125,8 @@ export default {
     const method = selectMethod(endpoint, data)
     const retries = endpoint.retries || 0
     const headers = createHeaders(endpoint, auth)
+
+    debug('Sending to %s %s: %o', method, uri, data)
 
     if (params.dryrun) {
       return {
