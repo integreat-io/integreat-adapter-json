@@ -192,6 +192,48 @@ test('should retrieve with auth headers', async (t) => {
   t.is(ret.status, 'ok')
 })
 
+test('should retrieve with auth params in querystring', async (t) => {
+  nock('http://json10.test')
+    .put('/entries/ent1', '{}')
+    .query({ authorization: 'Th@&t0k3n', timestamp: 1554407539 })
+    .reply(200)
+  const auth = { Authorization: 'Th@&t0k3n', timestamp: 1554407539 }
+  const request = {
+    method: 'MUTATION',
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json10.test/entries/ent1',
+      authAsQuery: true
+    }),
+    data: '{}',
+    auth
+  }
+
+  const ret = await adapter.send(request)
+
+  t.is(ret.status, 'ok', ret.error)
+})
+
+test('should retrieve with auth params in querystring when uri has querystring', async (t) => {
+  nock('http://json10.test')
+    .put('/entries/ent1', '{}')
+    .query({ 'page': 1, authorization: 'Th@&t0k3n', timestamp: 1554407539 })
+    .reply(200)
+  const auth = { Authorization: 'Th@&t0k3n', timestamp: 1554407539 }
+  const request = {
+    method: 'MUTATION',
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json10.test/entries/ent1?page=1',
+      authAsQuery: true
+    }),
+    data: '{}',
+    auth
+  }
+
+  const ret = await adapter.send(request)
+
+  t.is(ret.status, 'ok', ret.error)
+})
+
 test('should not throw when auth=true', async (t) => {
   nock('http://json11.test')
     .put('/entries/ent3', {})

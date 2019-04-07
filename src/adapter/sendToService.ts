@@ -11,7 +11,7 @@ interface SendOptions {
 }
 
 interface HttpError extends Error {
-  statusCode: number
+  statusCode?: number
 }
 
 const handleError = async ({ uri, auth }: SendOptions, error: HttpError) => {

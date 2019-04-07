@@ -37,7 +37,8 @@ export interface Options {
   uri?: string,
   headers?: Headers | {},
   method?: string,
-  retries?: number
+  retries?: number,
+  authAsQuery?: boolean
 }
 
 export interface CompiledOptions {
@@ -46,6 +47,7 @@ export interface CompiledOptions {
   headers?: Headers | {},
   method?: string,
   retries?: number
+  authAsQuery?: boolean
 }
 
 const selectMethod = (endpoint: CompiledOptions, data?: string | RequestData) =>
@@ -57,8 +59,22 @@ const isValidData = (data?: string | RequestData): data is (string | undefined) 
 const createHeaders = (endpoint: CompiledOptions, auth?: object | boolean | null) => ({
   'Content-Type': 'application/json',
   ...endpoint.headers,
-  ...((auth === true) ? {} : auth)
+  ...((auth === true || endpoint.authAsQuery === true) ? {} : auth)
 })
+
+const createQueryString = (params: Params) => Object.keys(params)
+  .map((key) => `${key.toLowerCase()}=${encodeURIComponent(params[key])}`)
+  .join('&')
+
+const appendQueryParams = (uri: string, params: Params) =>
+  `${uri}${(uri.indexOf('?') >= 0) ? '&' : '?'}${createQueryString(params)}`
+
+const addAuthToUri = (uri: string, endpoint: CompiledOptions, auth?: object | boolean | null) => {
+  if (uri && endpoint.authAsQuery === true && auth && auth !== true) {
+    return appendQueryParams(uri, auth)
+  }
+  return uri
+}
 
 export default {
   authentication: 'asHttpHeaders',
@@ -121,7 +137,7 @@ export default {
       return { status: 'badrequest', error: 'Request data is not valid JSON' }
     }
 
-    const uri = generateUri(endpoint.uri, params)
+    const uri = addAuthToUri(generateUri(endpoint.uri, params), endpoint, auth)
     const method = selectMethod(endpoint, data)
     const retries = endpoint.retries || 0
     const headers = createHeaders(endpoint, auth)
