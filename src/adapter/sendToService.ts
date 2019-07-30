@@ -1,14 +1,5 @@
 import got = require('got')
-import { Headers } from '.'
-
-interface SendOptions {
-  uri: string,
-  method: string,
-  data?: string,
-  headers: Headers | {},
-  auth?: object | boolean | null,
-  retries?: number
-}
+import { SendOptions } from '.'
 
 interface HttpError extends Error {
   statusCode?: number
@@ -45,12 +36,12 @@ const handleError = async ({ uri, auth }: SendOptions, error: HttpError) => {
 }
 
 export default async function sendToService (sendOptions: SendOptions) {
-  const { uri, method, data, headers, retries } = sendOptions
+  const { uri, method, body, headers, retries } = sendOptions
 
   try {
     const response = await got(uri, {
       method,
-      body: data,
+      body,
       headers,
       retry: { retries }
     })

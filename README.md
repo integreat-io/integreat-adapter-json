@@ -30,7 +30,10 @@ const integreat = require('integreat')
 const jsonAdapter = require('integreat-adapter-json')
 const defs = require('./config')
 
-const resources = integreat.resources(jsonAdapter)
+const resources = integreat.mergeResources(
+  integreat.resources(),
+  { adapters: { json: jsonAdapter() } }
+)
 const great = integreat(defs, resources)
 
 // ... and then dispatch actions as usual
@@ -48,7 +51,12 @@ Example source configuration:
 }
 ```
 
-Data will be sent with application/json.
+Data will be sent with content-type `application/json`.
+
+An optional logger may be provided to the `jsonAdapter()` function, to log out
+the request sent to the service, and its response. The logger must be an object
+with an `info()` and an `error()` function. Both should accept a string message
+as first argument, and a meta object as the second.
 
 ### Running the tests
 

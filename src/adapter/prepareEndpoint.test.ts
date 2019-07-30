@@ -1,7 +1,8 @@
 import test from 'ava'
 import { compile as compileUri } from 'great-uri-template'
 
-import adapter from '.'
+import json from '.'
+const adapter = json()
 
 test('should return endpoint object', (t) => {
   const options = {

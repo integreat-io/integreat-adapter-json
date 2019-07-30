@@ -1,6 +1,3 @@
 import adapter from './adapter'
 
-export = {
-  ...adapter,
-  default: adapter
-}
+export = Object.assign(() => adapter(), { default: adapter })

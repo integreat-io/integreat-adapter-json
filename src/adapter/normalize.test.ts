@@ -1,10 +1,11 @@
 import test from 'ava'
 
-import adapter from '.'
+import json from '.'
+const adapter = json()
 
 // Setup
 
-const request = { method: 'QUERY' }
+const request = { action: 'GET' }
 
 // Tests
 

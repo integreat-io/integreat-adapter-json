@@ -1,7 +1,8 @@
 import test from 'ava'
 import nock = require('nock')
 
-import adapter from '.'
+import json from '.'
+const adapter = json()
 
 // Setup
 
@@ -17,7 +18,7 @@ test('should send data and return status', async (t) => {
     .put('/entries/ent1', data)
     .reply(200, { id: 'ent1' })
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({
       uri: 'http://json1.test/entries/ent1',
       retries: 0
@@ -37,7 +38,7 @@ test('should use GET method as default when no data', async (t) => {
     .get('/entries/ent1')
     .reply(200, { id: 'ent1', type: 'entry' })
   const request = {
-    method: 'QUERY',
+    action: 'GET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json2.test/entries/ent1' })
   }
 
@@ -54,7 +55,7 @@ test('should use method from endpoint', async (t) => {
     .post('/entries/ent1', data)
     .reply(200, { id: 'ent1' })
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json3.test/entries/ent1', method: 'POST' }),
     data
   }
@@ -74,7 +75,7 @@ test('should generate url from endpoint params', async (t) => {
     uri: 'http://json4.test/entries/{id}',
     method: 'PUT'
   })
-  const request = { method: 'MUTATION', endpoint, data, params: { id: 'ent1', type: 'entry' } }
+  const request = { action: 'SET', endpoint, data, params: { id: 'ent1', type: 'entry' } }
 
   const ret = await adapter.send(request)
 
@@ -89,7 +90,7 @@ test('should return ok status on all 200-range statuses', async (t) => {
     .put('/entries/ent2', data)
     .reply(202, { id: 'ent2' })
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json5.test/entries/ent2' }),
     data
   }
@@ -105,7 +106,7 @@ test('should return error on not found', async (t) => {
     .get('/entries/unknown')
     .reply(404)
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json6.test/entries/unknown' })
   }
 
@@ -121,7 +122,7 @@ test('should return error on other error', async (t) => {
     .get('/entries/error')
     .reply(500)
   const request = {
-    method: 'QUERY',
+    action: 'GET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json7.test/entries/error' })
   }
 
@@ -137,7 +138,7 @@ test('should return error on request error', async (t) => {
     .get('/entries/ent1')
     .replyWithError('An awful error')
   const request = {
-    method: 'QUERY',
+    action: 'GET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json8.test/entries/ent1' })
   }
 
@@ -157,7 +158,7 @@ test('should retrieve with headers from endpoint', async (t) => {
     .reply(200)
   const auth = { Authorization: 'The_token' }
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({
       headers: { 'If-Match': '3-871801934' },
       uri: 'http://json9.test/entries/ent1'
@@ -181,7 +182,7 @@ test('should retrieve with auth headers', async (t) => {
     .reply(200)
   const auth = { Authorization: 'The_token' }
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json10.test/entries/ent1' }),
     data: '{}',
     auth
@@ -199,7 +200,7 @@ test('should retrieve with auth params in querystring', async (t) => {
     .reply(200)
   const auth = { Authorization: 'Th@&t0k3n', timestamp: 1554407539 }
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({
       uri: 'http://json10.test/entries/ent1',
       authAsQuery: true
@@ -220,7 +221,7 @@ test('should retrieve with auth params in querystring when uri has querystring',
     .reply(200)
   const auth = { Authorization: 'Th@&t0k3n', timestamp: 1554407539 }
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({
       uri: 'http://json10.test/entries/ent1?page=1',
       authAsQuery: true
@@ -239,7 +240,7 @@ test('should not throw when auth=true', async (t) => {
     .put('/entries/ent3', {})
     .reply(200)
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json11.test/entries/ent3' }),
     data: '{}',
     auth: true
@@ -255,7 +256,7 @@ test('should respond with badrequest on 400', async (t) => {
     .put('/entries/ent1', '{}')
     .reply(400, {})
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json14.test/entries/ent1' }),
     data: '{}',
     auth: {}
@@ -272,7 +273,7 @@ test('should respond with timeout on 408', async (t) => {
     .put('/entries/ent1', '{}')
     .reply(408, {})
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json15.test/entries/ent1' }),
     data: '{}',
     auth: {}
@@ -289,7 +290,7 @@ test('should reject on 401 with auth', async (t) => {
     .put('/entries/ent1', '{}')
     .reply(401, {})
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json12.test/entries/ent1' }),
     data: '{}',
     auth: {}
@@ -306,7 +307,7 @@ test('should reject on 401 without auth', async (t) => {
     .put('/entries/ent1', '{}')
     .reply(401, {})
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json13.test/entries/ent1' }),
     data: '{}',
     auth: null
@@ -323,7 +324,7 @@ test('should reject on 403 ', async (t) => {
     .put('/entries/ent1', '{}')
     .reply(403, {})
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json16.test/entries/ent1' }),
     data: '{}',
     auth: null
@@ -337,7 +338,7 @@ test('should reject on 403 ', async (t) => {
 
 test('should return with badrequest when data is not a string', async (t) => {
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json0.test/entries/ent1' }),
     data: {}
   }
@@ -355,7 +356,7 @@ test('should return request props on dry-run', async (t) => {
     method: 'PUT'
   })
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     endpoint,
     data,
     params: { id: 'ent1', type: 'entry', dryrun: true }
@@ -364,6 +365,7 @@ test('should return request props on dry-run', async (t) => {
     uri: 'http://json0.test/entries/ent1',
     method: 'PUT',
     body: data,
+    retries: 0,
     headers: {
       'Content-Type': 'application/json'
     }

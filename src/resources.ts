@@ -1,7 +1,7 @@
 import adapter from './adapter'
 
 const adapters = {
-  json: adapter
+  json: adapter()
 }
 
 export = {

@@ -1,14 +1,15 @@
 import test from 'ava'
 
-import adapter from '.'
+import json from '.'
+const adapter = json()
 
 test('should serialize request', async (t) => {
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     data: { id: 'ent1', type: 'entry', attributes: { title: 'Entry 1' } }
   }
   const expected = {
-    method: 'MUTATION',
+    action: 'SET',
     data: '{"id":"ent1","type":"entry","attributes":{"title":"Entry 1"}}'
   }
 
@@ -19,7 +20,7 @@ test('should serialize request', async (t) => {
 
 test('should serialize null as null', async (t) => {
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     data: null
   }
 
@@ -30,10 +31,10 @@ test('should serialize null as null', async (t) => {
 
 test('should serialize undefined as null', async (t) => {
   const request = {
-    method: 'QUERY'
+    action: 'GET'
   }
   const expected = {
-    method: 'QUERY',
+    action: 'GET',
     data: null
   }
 

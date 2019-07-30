@@ -19,7 +19,7 @@ export interface Headers {
 }
 
 export interface Request {
-  method: string,
+  action: string,
   data?: string | RequestData,
   endpoint?: CompiledOptions,
   params?: Params,
@@ -50,6 +50,20 @@ export interface CompiledOptions {
   authAsQuery?: boolean
 }
 
+export interface Logger {
+  info: (...args: any[]) => void
+  error: (...args: any[]) => void
+}
+
+export interface SendOptions {
+  uri: string
+  method: string
+  body?: string
+  headers: Headers | {}
+  retries?: number
+  auth?: object | boolean | null
+}
+
 const selectMethod = (endpoint: CompiledOptions, data?: string | RequestData) =>
   endpoint.method || ((data) ? 'PUT' : 'GET')
 
@@ -76,7 +90,30 @@ const addAuthToUri = (uri: string, endpoint: CompiledOptions, auth?: object | bo
   return uri
 }
 
-export default {
+const logRequest = (request: SendOptions, logger?: Logger) => {
+  const message = `Sending ${request.method} ${request.uri}`
+  debug('%s: %o', message, request.body)
+  if (logger) {
+    logger.info(message, request)
+  }
+}
+
+const logResponse = (response: Response, { uri, method }: SendOptions, logger?: Logger) => {
+  const { status } = response
+  const message = (status === 'ok')
+    ? `Success from ${method} ${uri}`
+    : `Error from ${method} ${uri}: ${status}`
+  debug('%s: %o', message, response)
+  if (logger) {
+    if (status === 'ok') {
+      logger.info(message, response)
+    } else {
+      logger.error(message, response)
+    }
+  }
+}
+
+export default (logger?: Logger) => ({
   authentication: 'asHttpHeaders',
 
   /**
@@ -142,16 +179,17 @@ export default {
     const retries = endpoint.retries || 0
     const headers = createHeaders(endpoint, auth)
 
-    debug('Sending to %s %s: %o', method, uri, data)
+    const request = { uri, method, body: data, headers, retries }
 
     if (params.dryrun) {
-      return {
-        status: 'dryrun',
-        data: { uri, method, body: data, headers }
-      }
+      return { status: 'dryrun', data: request }
     }
 
-    return sendToService({ uri, method, data, headers, auth, retries })
+    logRequest(request, logger)
+    const response = await sendToService({ ...request, auth })
+    logResponse(response, request, logger)
+
+    return response
   },
 
   /**
@@ -178,4 +216,4 @@ export default {
    * For the json adapter, this will do nothing.
    */
   disconnect: async (_connection: {} | null) => { return }
-}
+})

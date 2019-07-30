@@ -1,14 +1,15 @@
 import test from 'ava'
 import nock = require('nock')
 
-import adapter from '..'
+import json from '..'
 
 test('should prepare, serialize, send, and normalize', async (t) => {
+  const adapter = json()
   const scope = nock('http://json1.test')
     .put('/entries', '[{"id":"ent1","type":"entry"}]')
     .reply(200, { ok: true })
   const request = {
-    method: 'MUTATION',
+    action: 'SET',
     data: [{ id: 'ent1', type: 'entry' }],
     endpoint: adapter.prepareEndpoint({ uri: 'http://json1.test/entries' }),
     params: { type: 'entry' }

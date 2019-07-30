@@ -1,9 +1,10 @@
 import test from 'ava'
 
-import adapter from '.'
+import json from '.'
+const adapter = json()
 
 test('should be an Integreat adapter', (t) => {
-  t.truthy(adapter)
+  t.truthy(json)
   t.is(typeof adapter.prepareEndpoint, 'function')
   t.is(typeof adapter.send, 'function')
   t.is(typeof adapter.normalize, 'function')
