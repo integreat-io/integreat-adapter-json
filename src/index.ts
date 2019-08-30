@@ -1,3 +1,6 @@
-import adapter from './adapter'
+import adapter, { Logger } from './adapter'
 
-export = Object.assign(() => adapter(), { default: adapter })
+export = Object.assign(
+  (logger?: Logger) => adapter(logger),
+  { default: (logger?: Logger) => adapter(logger) }
+)

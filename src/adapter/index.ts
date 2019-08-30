@@ -99,10 +99,10 @@ const logRequest = (request: SendOptions, logger?: Logger) => {
 }
 
 const logResponse = (response: Response, { uri, method }: SendOptions, logger?: Logger) => {
-  const { status } = response
+  const { status, error } = response
   const message = (status === 'ok')
     ? `Success from ${method} ${uri}`
-    : `Error from ${method} ${uri}: ${status}`
+    : `Error '${status}' from ${method} ${uri}: ${error}`
   debug('%s: %o', message, response)
   if (logger) {
     if (status === 'ok') {

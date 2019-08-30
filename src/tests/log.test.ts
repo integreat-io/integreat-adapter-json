@@ -60,7 +60,7 @@ test('should log error response', async t => {
     endpoint: adapter.prepareEndpoint({ uri: 'http://json2.test/entries' }),
     params: { type: 'entry' }
   }
-  const expectedPostMessage = 'Error from PUT http://json2.test/entries: notfound'
+  const expectedPostMessage = 'Error \'notfound\' from PUT http://json2.test/entries: Could not find the url http://json2.test/entries'
   const expectedPostMeta = {
     status: 'notfound',
     error: 'Could not find the url http://json2.test/entries'
