@@ -70,8 +70,8 @@ const selectMethod = (endpoint: CompiledOptions, data?: string | RequestData) =>
 const isValidData = (data?: string | RequestData): data is (string | undefined) =>
   typeof data === 'string' || typeof data === 'undefined'
 
-const createHeaders = (endpoint: CompiledOptions, auth?: object | boolean | null) => ({
-  'Content-Type': 'application/json',
+const createHeaders = (endpoint: CompiledOptions, hasData: boolean, auth?: object | boolean | null) => ({
+  ...(hasData) ? { 'Content-Type': 'application/json' } : {},
   ...endpoint.headers,
   ...((auth === true || endpoint.authAsQuery === true) ? {} : auth)
 })
@@ -177,7 +177,7 @@ export default (logger?: Logger) => ({
     const uri = addAuthToUri(generateUri(endpoint.uri, params), endpoint, auth)
     const method = selectMethod(endpoint, data)
     const retries = endpoint.retries || 0
-    const headers = createHeaders(endpoint, auth)
+    const headers = createHeaders(endpoint, data !== undefined, auth)
 
     const request = { uri, method, body: data, headers, retries }
 

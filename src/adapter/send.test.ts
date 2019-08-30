@@ -49,6 +49,22 @@ test('should use GET method as default when no data', async (t) => {
   t.true(scope.isDone())
 })
 
+test('should not set content-type header when no body', async (t) => {
+  const scope = nock('http://json2.test', { badheaders: ['Content-Type'] })
+    .get('/entries/ent1')
+    .reply(200, { id: 'ent1', type: 'entry' })
+  const request = {
+    action: 'GET',
+    endpoint: adapter.prepareEndpoint({ uri: 'http://json2.test/entries/ent1' })
+  }
+
+  const ret = await adapter.send(request)
+
+  t.is(ret.status, 'ok', ret.error)
+  t.deepEqual(ret.data, '{"id":"ent1","type":"entry"}')
+  t.true(scope.isDone())
+})
+
 test('should use method from endpoint', async (t) => {
   const data = '{"id":"ent1","title":"Entry 1"}'
   const scope = nock('http://json3.test')
