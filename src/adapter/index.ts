@@ -1,4 +1,5 @@
 const debug = require('debug')('great:adapter:json')
+import { Method } from 'got'
 import { compile as compileUri, generate as generateUri } from 'great-uri-template'
 import sendToService from './sendToService'
 
@@ -19,33 +20,33 @@ export interface Headers {
 }
 
 export interface Request {
-  action: string,
-  data?: string | RequestData,
-  endpoint?: CompiledOptions,
-  params?: Params,
+  action: string
+  data?: string | RequestData
+  endpoint?: CompiledOptions
+  params?: Params
   auth?: object | boolean | null
 }
 
 export interface Response {
-  status: string,
-  data?: any,
+  status: string
+  data?: any
   error?: string
 }
 
 export interface Options {
-  baseUri?: string | null,
-  uri?: string,
-  headers?: Headers | {},
-  method?: string,
-  retries?: number,
+  baseUri?: string | null
+  uri?: string
+  headers?: Headers | {}
+  method?: Method
+  retries?: number
   authAsQuery?: boolean
 }
 
 export interface CompiledOptions {
-  baseUri?: string | null,
-  uri: (string | object)[],
-  headers?: Headers | {},
-  method?: string,
+  baseUri?: string | null
+  uri: (string | object)[]
+  headers?: Headers | {}
+  method?: Method
   retries?: number
   authAsQuery?: boolean
 }
@@ -57,7 +58,7 @@ export interface Logger {
 
 export interface SendOptions {
   uri: string
-  method: string
+  method: Method
   body?: string
   headers: Headers | {}
   retries?: number

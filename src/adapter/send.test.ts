@@ -122,7 +122,7 @@ test('should return error on not found', async (t) => {
     .get('/entries/unknown')
     .reply(404)
   const request = {
-    action: 'SET',
+    action: 'GET',
     endpoint: adapter.prepareEndpoint({ uri: 'http://json6.test/entries/unknown' })
   }
 

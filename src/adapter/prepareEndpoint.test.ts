@@ -10,14 +10,14 @@ test('should return endpoint object', (t) => {
     headers: {
       'If-Match': '3-871801934'
     },
-    method: 'POST'
+    method: 'POST' as const
   }
   const expected = {
     uri: ['http://example.com/'],
     headers: {
       'If-Match': '3-871801934'
     },
-    method: 'POST'
+    method: 'POST' as const
   }
 
   const ret = adapter.prepareEndpoint(options)

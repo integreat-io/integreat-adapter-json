@@ -1,20 +1,28 @@
-import got = require('got')
+import got, { HTTPError } from 'got'
 import { SendOptions } from '.'
 
-interface HttpError extends Error {
-  statusCode?: number
-}
+const extractFromError = (error: HTTPError | Error) =>
+  error instanceof HTTPError
+    ? {
+      statusCode: error.response.statusCode,
+      statusMessage: error.response.statusMessage
+    }
+    : {
+      statusCode: undefined,
+      statusMessage: error.message
+    }
 
-const handleError = async ({ uri, auth }: SendOptions, error: HttpError) => {
+async function handleError ({ uri, auth }: SendOptions, error: HTTPError | Error) {
+  const { statusCode, statusMessage } = extractFromError(error)
   const response = {
     status: 'error',
-    error: `Server returned ${error.statusCode} for ${uri}`
+    error: `Server returned ${statusCode} for ${uri}`
   }
 
-  if (typeof error.statusCode === 'undefined') {
-    response.error = `Server returned '${error}' for ${uri}`
+  if (statusCode === undefined) {
+    response.error = `Server returned '${statusMessage}' for ${uri}`
   } else {
-    switch (error.statusCode) {
+    switch (statusCode) {
       case 400:
         response.status = 'badrequest'
         break
@@ -43,7 +51,7 @@ export default async function sendToService (sendOptions: SendOptions) {
       method,
       body,
       headers,
-      retry: { retries }
+      retry: retries
     })
     return { status: 'ok', data: response.body }
   } catch (err) {
