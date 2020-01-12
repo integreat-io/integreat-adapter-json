@@ -44,10 +44,15 @@ test('should merge service options and endpoint options', (t) => {
   t.deepEqual(ret, expected)
 })
 
-test('should throw when no uri', (t) => {
+test('should set uri to undefined when missing', (t) => {
   const options = {}
+  const expected = {
+    uri: undefined
+  }
 
-  t.throws(() => adapter.prepareEndpoint(options))
+  const ret = adapter.prepareEndpoint(options)
+
+  t.deepEqual(ret, expected)
 })
 
 test('should compile uri', (t) => {

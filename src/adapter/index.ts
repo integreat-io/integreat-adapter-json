@@ -69,7 +69,7 @@ const selectMethod = (endpoint: CompiledOptions, data?: string | RequestData) =>
   endpoint.method || ((data) ? 'PUT' : 'GET')
 
 const isValidData = (data?: string | RequestData): data is (string | undefined) =>
-  typeof data === 'string' || typeof data === 'undefined'
+  typeof data === 'string' || data === undefined
 
 const createHeaders = (endpoint: CompiledOptions, hasData: boolean, auth?: object | boolean | null) => ({
   ...(hasData) ? { 'Content-Type': 'application/json' } : {},
@@ -126,11 +126,8 @@ export default (logger?: Logger) => ({
     const options = { ...serviceOptions, ...endpointOptions }
     const { uri: uriTemplate, baseUri } = options
 
-    if (!uriTemplate) {
-      throw new TypeError('The uri prop is required')
-    }
-
-    const uri = compileUri((baseUri || '') + uriTemplate)
+    const uri = uriTemplate
+      ? compileUri((baseUri || '') + uriTemplate) : undefined
 
     return { ...options, uri }
   },
@@ -163,7 +160,7 @@ export default (logger?: Logger) => ({
    * headers and added to the request's headers.
    */
   async send ({ endpoint, data, auth, params = {} }: Request): Promise<Response> {
-    if (!endpoint) {
+    if (!endpoint || !endpoint.uri) {
       return { status: 'error', error: 'No endpoint specified in the request' }
     }
 
@@ -198,7 +195,7 @@ export default (logger?: Logger) => ({
    * Returns the response parsed from a JSON string.
    */
   async normalize (response: Response, _request: Request): Promise<Response> {
-    const data = (typeof response.data === 'undefined' || response.data === '')
+    const data = (response.data === undefined || response.data === '')
       ? null
       : response.data
 

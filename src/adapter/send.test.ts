@@ -146,7 +146,7 @@ test('should return error on other error', async (t) => {
 
   t.is(ret.status, 'error')
   t.is(ret.error, 'Server returned 500 for http://json7.test/entries/error')
-  t.is(typeof ret.data, 'undefined')
+  t.is(ret.data, undefined)
 })
 
 test('should return error on request error', async (t) => {
@@ -393,8 +393,16 @@ test('should return request props on dry-run', async (t) => {
   t.deepEqual(ret.data, expectedData)
 })
 
-test('should return error when no uri or endpoint', async (t) => {
+test('should return error when no endpoint', async (t) => {
   const request = {}
+
+  const ret = await adapter.send(request as any)
+
+  t.is(ret.status, 'error')
+})
+
+test('should return error when no uri', async (t) => {
+  const request = { endpoint: { uri: undefined } }
 
   const ret = await adapter.send(request as any)
 
