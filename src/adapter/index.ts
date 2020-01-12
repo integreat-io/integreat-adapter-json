@@ -44,7 +44,7 @@ export interface Options {
 
 export interface CompiledOptions {
   baseUri?: string | null
-  uri: (string | object)[]
+  uri?: (string | object)[]
   headers?: Headers | {}
   method?: Method
   retries?: number
@@ -159,8 +159,11 @@ export default (logger?: Logger) => ({
    * If an auth object is provided, it is expected to be in the form of http
    * headers and added to the request's headers.
    */
-  async send ({ endpoint, data, auth, params = {} }: Request): Promise<Response> {
-    if (!endpoint || !endpoint.uri) {
+  async send (
+    { endpoint, data, auth, params = {} }: Request,
+    _connection?: object | null
+  ): Promise<Response> {
+    if (!endpoint || !endpoint.uri) {
       return { status: 'error', error: 'No endpoint specified in the request' }
     }
 
