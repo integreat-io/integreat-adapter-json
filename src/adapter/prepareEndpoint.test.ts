@@ -76,6 +76,26 @@ test('should use baseUri from service options', (t) => {
   t.deepEqual(ret.uri, expected)
 })
 
+test('should remove extra slash from baseUri and uri', (t) => {
+  const serviceOptions = { baseUri: 'http://example.com/' }
+  const options = { uri: '/{type}/{id}{?first,max}' }
+  const expected = compileUri('http://example.com/{type}/{id}{?first,max}')
+
+  const ret = adapter.prepareEndpoint(options, serviceOptions)
+
+  t.deepEqual(ret.uri, expected)
+})
+
+test('should add missing slash between baseUri and uri', (t) => {
+  const serviceOptions = { baseUri: 'http://example.com' }
+  const options = { uri: '{type}/{id}{?first,max}' }
+  const expected = compileUri('http://example.com/{type}/{id}{?first,max}')
+
+  const ret = adapter.prepareEndpoint(options, serviceOptions)
+
+  t.deepEqual(ret.uri, expected)
+})
+
 test('should not prepend unset baseUri', (t) => {
   const serviceOptions = {}
   const options = { uri: 'http://example.com/{type}/{id}{?first,max}' }

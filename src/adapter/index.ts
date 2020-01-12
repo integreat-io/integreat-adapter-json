@@ -114,6 +114,20 @@ const logResponse = (response: Response, { uri, method }: SendOptions, logger?: 
   }
 }
 
+function joinUris (baseUri?: string | null, uri?: string) {
+  if (baseUri && uri) {
+    if (baseUri.endsWith('/') && uri.startsWith('/')) {
+      return baseUri + uri.substr(1)
+    } else if (!baseUri.endsWith('/') && !uri.startsWith('/')) {
+      return baseUri + '/' + uri
+    } else {
+      return baseUri + uri
+    }
+  } else {
+    return uri ? uri : baseUri
+  }
+}
+
 export default (logger?: Logger) => ({
   authentication: 'asHttpHeaders',
 
@@ -126,10 +140,12 @@ export default (logger?: Logger) => ({
     const options = { ...serviceOptions, ...endpointOptions }
     const { uri: uriTemplate, baseUri } = options
 
-    const uri = uriTemplate
-      ? compileUri((baseUri || '') + uriTemplate) : undefined
+    const uri = joinUris(baseUri, uriTemplate)
 
-    return { ...options, uri }
+    return {
+      ...options,
+      uri: uri ? compileUri(uri) : undefined
+    }
   },
 
   /**
