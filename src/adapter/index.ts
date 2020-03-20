@@ -24,6 +24,7 @@ export interface Request {
   data?: string | RequestData
   endpoint?: CompiledOptions
   params?: Params
+  headers?: object
   auth?: object | boolean | null
 }
 
@@ -71,9 +72,10 @@ const selectMethod = (endpoint: CompiledOptions, data?: string | RequestData) =>
 const isValidData = (data?: string | RequestData): data is (string | undefined) =>
   typeof data === 'string' || data === undefined
 
-const createHeaders = (endpoint: CompiledOptions, hasData: boolean, auth?: object | boolean | null) => ({
+const createHeaders = (endpoint: CompiledOptions, hasData: boolean, headers?: object, auth?: object | boolean | null) => ({
   ...(hasData) ? { 'Content-Type': 'application/json' } : {},
   ...endpoint.headers,
+  ...headers,
   ...((auth === true || endpoint.authAsQuery === true) ? {} : auth)
 })
 
@@ -176,7 +178,7 @@ export default (logger?: Logger) => ({
    * headers and added to the request's headers.
    */
   async send (
-    { endpoint, data, auth, params = {} }: Request,
+    { endpoint, data, auth, params = {}, headers: reqHeaders }: Request,
     _connection?: object | null
   ): Promise<Response> {
     if (!endpoint || !endpoint.uri) {
@@ -194,7 +196,7 @@ export default (logger?: Logger) => ({
     const uri = addAuthToUri(generateUri(endpoint.uri, params), endpoint, auth)
     const method = selectMethod(endpoint, data)
     const retries = endpoint.retries || 0
-    const headers = createHeaders(endpoint, data !== undefined, auth)
+    const headers = createHeaders(endpoint, data !== undefined, reqHeaders, auth)
 
     const request = { uri, method, body: data, headers, retries }
 

@@ -209,6 +209,33 @@ test('should retrieve with auth headers', async (t) => {
   t.is(ret.status, 'ok')
 })
 
+test('should retrieve with headers from request', async (t) => {
+  nock('http://json17.test', {
+    reqheaders: {
+      'authorization': 'The_token',
+      'If-Match': '3-871801934',
+      'x-correlation-id': '1234567890'
+    }
+  })
+    .put('/entries/ent1', '{}')
+    .reply(200)
+  const auth = { Authorization: 'The_token' }
+  const request = {
+    action: 'SET',
+    endpoint: adapter.prepareEndpoint({
+      headers: { 'If-Match': '3-871801934' },
+      uri: 'http://json17.test/entries/ent1'
+    }),
+    headers: { 'x-correlation-id': '1234567890' },
+    data: '{}',
+    auth
+  }
+
+  const ret = await adapter.send(request)
+
+  t.is(ret.status, 'ok', ret.error)
+})
+
 test('should retrieve with auth params in querystring', async (t) => {
   nock('http://json10.test')
     .put('/entries/ent1', '{}')
