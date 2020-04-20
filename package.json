@@ -1,6 +1,6 @@
 {
   "name": "integreat-adapter-json",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "JSON adapter for Integreat",
   "keywords": [
     "json",
