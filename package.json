@@ -15,7 +15,7 @@
     "test": "npm run lint && tsc && nyc --reporter=text-summary ava dist/**/*.test.js",
     "test:watch": "npm run dev",
     "test:inspect": "node --inspect node_modules/ava/profile.js",
-    "dev": "ava --watch",
+    "dev": "ava --watch src/**/*.test.ts",
     "build": "tsc",
     "prepare": "npm run build",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
@@ -23,18 +23,16 @@
     "lint": "tslint --project tsconfig.json --config tslint.json"
   },
   "ava": {
-    "compileEnhancements": false,
     "extensions": [
-      "ts"
+      "ts",
+      "js"
     ],
     "require": [
       "ts-node/register/transpile-only"
     ],
     "files": [
+      "dist/**/*.test.js",
       "src/**/*.test.ts"
-    ],
-    "sources": [
-      "src/**/!(*.test).ts"
     ]
   },
   "nyc": {
@@ -67,15 +65,14 @@
     "great-uri-template": "^0.1.5"
   },
   "devDependencies": {
-    "@types/sinon": "^7.5.2",
-    "ava": "^2.4.0",
-    "babel-preset-env": "^1.7.0",
+    "@types/sinon": "^9.0.0",
+    "ava": "^3.7.1",
     "coveralls": "^3.0.11",
     "nock": "^12.0.3",
-    "nyc": "^15.0.0",
-    "sinon": "^9.0.1",
-    "ts-node": "^8.8.1",
-    "tslint": "^6.1.0",
+    "nyc": "^15.0.1",
+    "sinon": "^9.0.2",
+    "ts-node": "^8.8.2",
+    "tslint": "^6.1.1",
     "tslint-config-security": "^1.16.0",
     "tslint-config-standard": "^9.0.0",
     "typescript": "^3.8.3"
