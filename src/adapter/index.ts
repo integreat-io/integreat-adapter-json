@@ -41,6 +41,7 @@ export interface Options {
   method?: Method
   retries?: number
   authAsQuery?: boolean
+  [key: string]: unknown
 }
 
 export interface CompiledOptions {
@@ -50,6 +51,7 @@ export interface CompiledOptions {
   method?: Method
   retries?: number
   authAsQuery?: boolean
+  [key: string]: unknown
 }
 
 export interface Logger {
@@ -193,7 +195,7 @@ export default (logger?: Logger) => ({
       return { status: 'badrequest', error: 'Request data is not valid JSON' }
     }
 
-    const uri = addAuthToUri(generateUri(endpoint.uri, params), endpoint, auth)
+    const uri = addAuthToUri(generateUri(endpoint.uri, { ...endpoint, ...params }), endpoint, auth)
     const method = selectMethod(endpoint, data)
     const retries = endpoint.retries || 0
     const headers = createHeaders(endpoint, data !== undefined, reqHeaders, auth)

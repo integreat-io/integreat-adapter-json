@@ -82,14 +82,16 @@ test('should use method from endpoint', async (t) => {
   t.true(scope.isDone())
 })
 
-test('should generate url from endpoint params', async (t) => {
+test('should generate url from endpoint params and options', async (t) => {
   const data = '{"id":"ent1","title":"Entry 1"}'
   const scope = nock('http://json4.test')
     .put('/entries/ent1', data)
+    .query({ filter: 'archive' })
     .reply(200, { id: 'ent1' })
   const endpoint = adapter.prepareEndpoint({
-    uri: 'http://json4.test/entries/{id}',
-    method: 'PUT'
+    uri: 'http://json4.test/entries/{id}{?filter}',
+    method: 'PUT',
+    filter: 'archive'
   })
   const request = { action: 'SET', endpoint, data, params: { id: 'ent1', type: 'entry' } }
 
