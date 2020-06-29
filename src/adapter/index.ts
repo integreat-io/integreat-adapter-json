@@ -1,6 +1,9 @@
 const debug = require('debug')('great:adapter:json')
 import { Method } from 'got'
-import { compile as compileUri, generate as generateUri } from 'great-uri-template'
+import {
+  compile as compileUri,
+  generate as generateUri
+} from 'great-uri-template'
 import sendToService from './sendToService'
 
 type DataProperty = string | number | boolean | object
@@ -69,28 +72,41 @@ export interface SendOptions {
 }
 
 const selectMethod = (endpoint: CompiledOptions, data?: string | RequestData) =>
-  endpoint.method || ((data) ? 'PUT' : 'GET')
+  endpoint.method || (data ? 'PUT' : 'GET')
 
-const isValidData = (data?: string | RequestData): data is (string | undefined) =>
+const isValidData = (data?: string | RequestData): data is string | undefined =>
   typeof data === 'string' || data === undefined
 
-const createHeaders = (endpoint: CompiledOptions, hasData: boolean, headers?: object, auth?: object | boolean | null) => ({
-  ...(hasData) ? { 'Content-Type': 'application/json' } : {},
+const createHeaders = (
+  endpoint: CompiledOptions,
+  hasData: boolean,
+  headers?: object,
+  auth?: object | boolean | null
+) => ({
+  ...(hasData ? { 'Content-Type': 'application/json' } : {}),
   ...endpoint.headers,
   ...headers,
-  ...((auth === true || endpoint.authAsQuery === true) ? {} : auth)
+  ...(auth === true || endpoint.authAsQuery === true ? {} : auth)
 })
 
-const createQueryString = (params: Params) => Object.keys(params)
-  .map((key) => `${key.toLowerCase()}=${encodeURIComponent(params[key])}`)
-  .join('&')
+const createQueryString = (params: Params) =>
+  Object.keys(params)
+    .map((key) => `${key.toLowerCase()}=${encodeURIComponent(params[key])}`)
+    .join('&')
 
 const appendQueryParams = (uri: string, params: Params) =>
-  `${uri}${(uri.indexOf('?') >= 0) ? '&' : '?'}${createQueryString(params)}`
+  `${uri}${uri.indexOf('?') >= 0 ? '&' : '?'}${createQueryString(params)}`
 
-const addAuthToUri = (uri: string, endpoint: CompiledOptions, auth?: object | boolean | null) => {
+const removeDanglingQuestionMark = (uri: string) =>
+  uri.endsWith('?') ? uri.slice(0, -1) : uri
+
+const addAuthToUri = (
+  uri: string,
+  endpoint: CompiledOptions,
+  auth?: object | boolean | null
+) => {
   if (uri && endpoint.authAsQuery === true && auth && auth !== true) {
-    return appendQueryParams(uri, auth)
+    return appendQueryParams(removeDanglingQuestionMark(uri), auth)
   }
   return uri
 }
@@ -103,11 +119,16 @@ const logRequest = (request: SendOptions, logger?: Logger) => {
   }
 }
 
-const logResponse = (response: Response, { uri, method }: SendOptions, logger?: Logger) => {
+const logResponse = (
+  response: Response,
+  { uri, method }: SendOptions,
+  logger?: Logger
+) => {
   const { status, error } = response
-  const message = (status === 'ok')
-    ? `Success from ${method} ${uri}`
-    : `Error '${status}' from ${method} ${uri}: ${error}`
+  const message =
+    status === 'ok'
+      ? `Success from ${method} ${uri}`
+      : `Error '${status}' from ${method} ${uri}: ${error}`
   debug('%s: %o', message, response)
   if (logger) {
     if (status === 'ok') {
@@ -157,7 +178,11 @@ export default (logger?: Logger) => ({
    * For the json adapter, this will only return the connection object –
    * whatever it is.
    */
-  connect: async (_serviceOptions: Options, _auth: object | null, connection: object | null) => connection,
+  connect: async (
+    _serviceOptions: Options,
+    _auth: object | null,
+    connection: object | null
+  ) => connection,
 
   /**
    * Serialize request data before sending to the service.
@@ -167,7 +192,7 @@ export default (logger?: Logger) => ({
     const { data } = request
     return {
       ...request,
-      data: (data) ? JSON.stringify(data) : null
+      data: data ? JSON.stringify(data) : null
     }
   },
 
@@ -195,10 +220,19 @@ export default (logger?: Logger) => ({
       return { status: 'badrequest', error: 'Request data is not valid JSON' }
     }
 
-    const uri = addAuthToUri(generateUri(endpoint.uri, { ...endpoint, ...params }), endpoint, auth)
+    const uri = addAuthToUri(
+      generateUri(endpoint.uri, { ...endpoint, ...params }),
+      endpoint,
+      auth
+    )
     const method = selectMethod(endpoint, data)
     const retries = endpoint.retries || 0
-    const headers = createHeaders(endpoint, data !== undefined, reqHeaders, auth)
+    const headers = createHeaders(
+      endpoint,
+      data !== undefined,
+      reqHeaders,
+      auth
+    )
 
     const request = { uri, method, body: data, headers, retries }
 
@@ -218,17 +252,21 @@ export default (logger?: Logger) => ({
    * Returns the response parsed from a JSON string.
    */
   async normalize (response: Response, _request: Request): Promise<Response> {
-    const data = (response.data === undefined || response.data === '')
-      ? null
-      : response.data
+    const data =
+      response.data === undefined || response.data === ''
+        ? null
+        : response.data
 
     try {
       return {
         ...response,
-        data: (typeof data !== 'object') ? JSON.parse(data) : data
+        data: typeof data !== 'object' ? JSON.parse(data) : data
       }
     } catch (error) {
-      return { status: 'badresponse', error: 'Response data is not valid JSON' }
+      return {
+        status: 'badresponse',
+        error: 'Response data is not valid JSON'
+      }
     }
   },
 
@@ -236,5 +274,7 @@ export default (logger?: Logger) => ({
    * Disconnect from service.
    * For the json adapter, this will do nothing.
    */
-  disconnect: async (_connection: {} | null) => { return }
+  disconnect: async (_connection: {} | null) => {
+    return
+  }
 })

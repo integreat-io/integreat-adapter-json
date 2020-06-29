@@ -14,7 +14,9 @@ test.after(() => {
 
 test('should send data and return status', async (t) => {
   const data = '{"id":"ent1","title":"Entry 1"}'
-  const scope = nock('http://json1.test', { reqheaders: { 'Content-Type': 'application/json' } })
+  const scope = nock('http://json1.test', {
+    reqheaders: { 'Content-Type': 'application/json' }
+  })
     .put('/entries/ent1', data)
     .reply(200, { id: 'ent1' })
   const request = {
@@ -39,7 +41,9 @@ test('should use GET method as default when no data', async (t) => {
     .reply(200, { id: 'ent1', type: 'entry' })
   const request = {
     action: 'GET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json2.test/entries/ent1' })
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json2.test/entries/ent1'
+    })
   }
 
   const ret = await adapter.send(request)
@@ -50,12 +54,14 @@ test('should use GET method as default when no data', async (t) => {
 })
 
 test('should not set content-type header when no body', async (t) => {
-  const scope = nock('http://json2.test', { badheaders: ['Content-Type'] })
+  const scope = nock('http://json19.test', { badheaders: ['Content-Type'] })
     .get('/entries/ent1')
     .reply(200, { id: 'ent1', type: 'entry' })
   const request = {
     action: 'GET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json2.test/entries/ent1' })
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json19.test/entries/ent1'
+    })
   }
 
   const ret = await adapter.send(request)
@@ -72,7 +78,10 @@ test('should use method from endpoint', async (t) => {
     .reply(200, { id: 'ent1' })
   const request = {
     action: 'SET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json3.test/entries/ent1', method: 'POST' }),
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json3.test/entries/ent1',
+      method: 'POST'
+    }),
     data
   }
 
@@ -93,7 +102,12 @@ test('should generate url from endpoint params and options', async (t) => {
     method: 'PUT',
     filter: 'archive'
   })
-  const request = { action: 'SET', endpoint, data, params: { id: 'ent1', type: 'entry' } }
+  const request = {
+    action: 'SET',
+    endpoint,
+    data,
+    params: { id: 'ent1', type: 'entry' }
+  }
 
   const ret = await adapter.send(request)
 
@@ -109,7 +123,9 @@ test('should return ok status on all 200-range statuses', async (t) => {
     .reply(202, { id: 'ent2' })
   const request = {
     action: 'SET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json5.test/entries/ent2' }),
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json5.test/entries/ent2'
+    }),
     data
   }
 
@@ -120,12 +136,12 @@ test('should return ok status on all 200-range statuses', async (t) => {
 })
 
 test('should return error on not found', async (t) => {
-  nock('http://json6.test')
-    .get('/entries/unknown')
-    .reply(404)
+  nock('http://json6.test').get('/entries/unknown').reply(404)
   const request = {
     action: 'GET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json6.test/entries/unknown' })
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json6.test/entries/unknown'
+    })
   }
 
   const ret = await adapter.send(request)
@@ -136,12 +152,12 @@ test('should return error on not found', async (t) => {
 })
 
 test('should return error on other error', async (t) => {
-  nock('http://json7.test')
-    .get('/entries/error')
-    .reply(500)
+  nock('http://json7.test').get('/entries/error').reply(500)
   const request = {
     action: 'GET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json7.test/entries/error' })
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json7.test/entries/error'
+    })
   }
 
   const ret = await adapter.send(request)
@@ -157,7 +173,9 @@ test('should return error on request error', async (t) => {
     .replyWithError('An awful error')
   const request = {
     action: 'GET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json8.test/entries/ent1' })
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json8.test/entries/ent1'
+    })
   }
 
   const ret = await adapter.send(request)
@@ -168,7 +186,7 @@ test('should return error on request error', async (t) => {
 test('should retrieve with headers from endpoint', async (t) => {
   nock('http://json9.test', {
     reqheaders: {
-      'authorization': 'The_token',
+      authorization: 'The_token',
       'If-Match': '3-871801934'
     }
   })
@@ -193,7 +211,7 @@ test('should retrieve with headers from endpoint', async (t) => {
 test('should retrieve with auth headers', async (t) => {
   nock('http://json10.test', {
     reqheaders: {
-      'authorization': 'The_token'
+      authorization: 'The_token'
     }
   })
     .put('/entries/ent1', '{}')
@@ -201,7 +219,9 @@ test('should retrieve with auth headers', async (t) => {
   const auth = { Authorization: 'The_token' }
   const request = {
     action: 'SET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json10.test/entries/ent1' }),
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json10.test/entries/ent1'
+    }),
     data: '{}',
     auth
   }
@@ -214,7 +234,7 @@ test('should retrieve with auth headers', async (t) => {
 test('should retrieve with headers from request', async (t) => {
   nock('http://json17.test', {
     reqheaders: {
-      'authorization': 'The_token',
+      authorization: 'The_token',
       'If-Match': '3-871801934',
       'x-correlation-id': '1234567890'
     }
@@ -262,7 +282,7 @@ test('should retrieve with auth params in querystring', async (t) => {
 test('should retrieve with auth params in querystring when uri has querystring', async (t) => {
   nock('http://json10.test')
     .put('/entries/ent1', '{}')
-    .query({ 'page': 1, authorization: 'Th@&t0k3n', timestamp: 1554407539 })
+    .query({ page: 1, authorization: 'Th@&t0k3n', timestamp: 1554407539 })
     .reply(200)
   const auth = { Authorization: 'Th@&t0k3n', timestamp: 1554407539 }
   const request = {
@@ -280,13 +300,35 @@ test('should retrieve with auth params in querystring when uri has querystring',
   t.is(ret.status, 'ok', ret.error)
 })
 
-test('should not throw when auth=true', async (t) => {
-  nock('http://json11.test')
-    .put('/entries/ent3', {})
+test('should retrieve with auth params in querystring when uri has unused querystring params', async (t) => {
+  nock('http://json18.test')
+    .put((uri) => !uri.includes('?&')) // Check for faulty use of question mark followed by ampersand
     .reply(200)
+  const auth = { Authorization: 'Th@&t0k3n', timestamp: 1554407539 }
   const request = {
     action: 'SET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json11.test/entries/ent3' }),
+    params: { orderId: '12345' },
+    endpoint: adapter.prepareEndpoint({
+      uri:
+        'http://json18.test/orders/{orderId}/refunds{?per_page=pageSize?,page=page?,after=createdAfter?}',
+      authAsQuery: true
+    }),
+    data: '{}',
+    auth
+  }
+
+  const ret = await adapter.send(request)
+
+  t.is(ret.status, 'ok', ret.error)
+})
+
+test('should not throw when auth=true', async (t) => {
+  nock('http://json11.test').put('/entries/ent3', {}).reply(200)
+  const request = {
+    action: 'SET',
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json11.test/entries/ent3'
+    }),
     data: '{}',
     auth: true
   }
@@ -297,12 +339,12 @@ test('should not throw when auth=true', async (t) => {
 })
 
 test('should respond with badrequest on 400', async (t) => {
-  nock('http://json14.test')
-    .put('/entries/ent1', '{}')
-    .reply(400, {})
+  nock('http://json14.test').put('/entries/ent1', '{}').reply(400, {})
   const request = {
     action: 'SET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json14.test/entries/ent1' }),
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json14.test/entries/ent1'
+    }),
     data: '{}',
     auth: {}
   }
@@ -314,12 +356,12 @@ test('should respond with badrequest on 400', async (t) => {
 })
 
 test('should respond with timeout on 408', async (t) => {
-  nock('http://json15.test')
-    .put('/entries/ent1', '{}')
-    .reply(408, {})
+  nock('http://json15.test').put('/entries/ent1', '{}').reply(408, {})
   const request = {
     action: 'SET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json15.test/entries/ent1' }),
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json15.test/entries/ent1'
+    }),
     data: '{}',
     auth: {}
   }
@@ -331,12 +373,12 @@ test('should respond with timeout on 408', async (t) => {
 })
 
 test('should reject on 401 with auth', async (t) => {
-  nock('http://json12.test')
-    .put('/entries/ent1', '{}')
-    .reply(401, {})
+  nock('http://json12.test').put('/entries/ent1', '{}').reply(401, {})
   const request = {
     action: 'SET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json12.test/entries/ent1' }),
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json12.test/entries/ent1'
+    }),
     data: '{}',
     auth: {}
   }
@@ -348,12 +390,12 @@ test('should reject on 401 with auth', async (t) => {
 })
 
 test('should reject on 401 without auth', async (t) => {
-  nock('http://json13.test')
-    .put('/entries/ent1', '{}')
-    .reply(401, {})
+  nock('http://json13.test').put('/entries/ent1', '{}').reply(401, {})
   const request = {
     action: 'SET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json13.test/entries/ent1' }),
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json13.test/entries/ent1'
+    }),
     data: '{}',
     auth: null
   }
@@ -365,12 +407,12 @@ test('should reject on 401 without auth', async (t) => {
 })
 
 test('should reject on 403 ', async (t) => {
-  nock('http://json16.test')
-    .put('/entries/ent1', '{}')
-    .reply(403, {})
+  nock('http://json16.test').put('/entries/ent1', '{}').reply(403, {})
   const request = {
     action: 'SET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json16.test/entries/ent1' }),
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json16.test/entries/ent1'
+    }),
     data: '{}',
     auth: null
   }
@@ -384,7 +426,9 @@ test('should reject on 403 ', async (t) => {
 test('should return with badrequest when data is not a string', async (t) => {
   const request = {
     action: 'SET',
-    endpoint: adapter.prepareEndpoint({ uri: 'http://json0.test/entries/ent1' }),
+    endpoint: adapter.prepareEndpoint({
+      uri: 'http://json0.test/entries/ent1'
+    }),
     data: {}
   }
 
