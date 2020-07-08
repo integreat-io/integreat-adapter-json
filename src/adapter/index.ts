@@ -63,8 +63,8 @@ export interface CompiledOptions {
 }
 
 export interface Logger {
-  info: (...args: unknown[]) => void
-  error: (...args: unknown[]) => void
+  info: (message: string, ...meta: unknown[]) => void
+  error: (message: string, ...meta: unknown[]) => void
 }
 
 export interface SendOptions {
