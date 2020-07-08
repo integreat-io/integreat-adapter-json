@@ -2,7 +2,7 @@ const debug = require('debug')('great:adapter:json')
 import { Method } from 'got'
 import {
   compile as compileUri,
-  generate as generateUri
+  generate as generateUri,
 } from 'great-uri-template'
 import sendToService from './sendToService'
 
@@ -43,6 +43,7 @@ export interface Options {
   headers?: Headers | {}
   method?: Method
   retries?: number
+  timeout?: number
   authAsQuery?: boolean
   [key: string]: unknown
 }
@@ -53,6 +54,7 @@ export interface CompiledOptions {
   headers?: Headers | {}
   method?: Method
   retries?: number
+  timeout?: number
   authAsQuery?: boolean
   [key: string]: unknown
 }
@@ -68,6 +70,7 @@ export interface SendOptions {
   body?: string
   headers: Headers | {}
   retries?: number
+  timeout?: number
   auth?: object | boolean | null
 }
 
@@ -86,7 +89,7 @@ const createHeaders = (
   ...(hasData ? { 'Content-Type': 'application/json' } : {}),
   ...endpoint.headers,
   ...headers,
-  ...(auth === true || endpoint.authAsQuery === true ? {} : auth)
+  ...(auth === true || endpoint.authAsQuery === true ? {} : auth),
 })
 
 const createQueryString = (params: Params) =>
@@ -139,7 +142,7 @@ const logResponse = (
   }
 }
 
-function joinUris (baseUri?: string | null, uri?: string) {
+function joinUris(baseUri?: string | null, uri?: string) {
   if (baseUri && uri) {
     if (baseUri.endsWith('/') && uri.startsWith('/')) {
       return baseUri + uri.substr(1)
@@ -161,7 +164,7 @@ export default (logger?: Logger) => ({
    * The endpoint options are only used by the adapter.
    * Might also be given service options, which are also adapter specific.
    */
-  prepareEndpoint (endpointOptions: Options, serviceOptions?: Options) {
+  prepareEndpoint(endpointOptions: Options, serviceOptions?: Options) {
     const options = { ...serviceOptions, ...endpointOptions }
     const { uri: uriTemplate, baseUri } = options
 
@@ -169,7 +172,7 @@ export default (logger?: Logger) => ({
 
     return {
       ...options,
-      uri: uri ? compileUri(uri) : undefined
+      uri: uri ? compileUri(uri) : undefined,
     }
   },
 
@@ -188,11 +191,11 @@ export default (logger?: Logger) => ({
    * Serialize request data before sending to the service.
    * Returns request with the data stringified as JSON.
    */
-  async serialize (request: Request): Promise<Request> {
+  async serialize(request: Request): Promise<Request> {
     const { data } = request
     return {
       ...request,
-      data: data ? JSON.stringify(data) : null
+      data: data ? JSON.stringify(data) : null,
     }
   },
 
@@ -204,7 +207,7 @@ export default (logger?: Logger) => ({
    * If an auth object is provided, it is expected to be in the form of http
    * headers and added to the request's headers.
    */
-  async send (
+  async send(
     { endpoint, data, auth, params = {}, headers: reqHeaders }: Request,
     _connection?: object | null
   ): Promise<Response> {
@@ -226,7 +229,8 @@ export default (logger?: Logger) => ({
       auth
     )
     const method = selectMethod(endpoint, data)
-    const retries = endpoint.retries || 0
+    const retries = endpoint.retries ?? 0
+    const timeout = endpoint.timeout ?? 60000
     const headers = createHeaders(
       endpoint,
       data !== undefined,
@@ -234,7 +238,7 @@ export default (logger?: Logger) => ({
       auth
     )
 
-    const request = { uri, method, body: data, headers, retries }
+    const request = { uri, method, body: data, headers, retries, timeout }
 
     if (params.dryrun) {
       return { status: 'dryrun', data: request }
@@ -251,21 +255,19 @@ export default (logger?: Logger) => ({
    * Normalize response data from the service.
    * Returns the response parsed from a JSON string.
    */
-  async normalize (response: Response, _request: Request): Promise<Response> {
+  async normalize(response: Response, _request: Request): Promise<Response> {
     const data =
-      response.data === undefined || response.data === ''
-        ? null
-        : response.data
+      response.data === undefined || response.data === '' ? null : response.data
 
     try {
       return {
         ...response,
-        data: typeof data !== 'object' ? JSON.parse(data) : data
+        data: typeof data !== 'object' ? JSON.parse(data) : data,
       }
     } catch (error) {
       return {
         status: 'badresponse',
-        error: 'Response data is not valid JSON'
+        error: 'Response data is not valid JSON',
       }
     }
   },
@@ -276,5 +278,5 @@ export default (logger?: Logger) => ({
    */
   disconnect: async (_connection: {} | null) => {
     return
-  }
+  },
 })

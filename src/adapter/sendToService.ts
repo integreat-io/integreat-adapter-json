@@ -4,19 +4,22 @@ import { SendOptions } from '.'
 const extractFromError = (error: HTTPError | Error) =>
   error instanceof HTTPError
     ? {
-      statusCode: error.response.statusCode,
-      statusMessage: error.response.statusMessage
-    }
+        statusCode: error.response.statusCode,
+        statusMessage: error.response.statusMessage,
+      }
     : {
-      statusCode: undefined,
-      statusMessage: error.message
-    }
+        statusCode: undefined,
+        statusMessage: error.message,
+      }
 
-async function handleError ({ uri, auth }: SendOptions, error: HTTPError | Error) {
+async function handleError(
+  { uri, auth }: SendOptions,
+  error: HTTPError | Error
+) {
   const { statusCode, statusMessage } = extractFromError(error)
   const response = {
     status: 'error',
-    error: `Server returned ${statusCode} for ${uri}`
+    error: `Server returned ${statusCode} for ${uri}`,
   }
 
   if (statusCode === undefined) {
@@ -29,7 +32,9 @@ async function handleError ({ uri, auth }: SendOptions, error: HTTPError | Error
       case 401:
       case 403:
         response.status = 'noaccess'
-        response.error = (auth) ? 'Not authorized' : 'Service requires authentication'
+        response.error = auth
+          ? 'Not authorized'
+          : 'Service requires authentication'
         break
       case 404:
         response.status = 'notfound'
@@ -43,15 +48,16 @@ async function handleError ({ uri, auth }: SendOptions, error: HTTPError | Error
   return response
 }
 
-export default async function sendToService (sendOptions: SendOptions) {
-  const { uri, method, body, headers, retries } = sendOptions
+export default async function sendToService(sendOptions: SendOptions) {
+  const { uri, method, body, headers, retries, timeout } = sendOptions
 
   try {
     const response = await got(uri, {
       method,
       body,
       headers,
-      retry: retries
+      retry: retries,
+      timeout,
     })
     return { status: 'ok', data: response.body }
   } catch (err) {

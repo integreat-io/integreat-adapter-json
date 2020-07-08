@@ -25,15 +25,15 @@ npm install integreat-adapter-json
 ```
 
 Example of use:
+
 ```javascript
 const integreat = require('integreat')
 const jsonAdapter = require('integreat-adapter-json')
 const defs = require('./config')
 
-const resources = integreat.mergeResources(
-  integreat.resources(),
-  { adapters: { json: jsonAdapter() } }
-)
+const resources = integreat.mergeResources(integreat.resources(), {
+  adapters: { json: jsonAdapter() },
+})
 const great = integreat(defs, resources)
 
 // ... and then dispatch actions as usual
@@ -57,6 +57,19 @@ An optional logger may be provided to the `jsonAdapter()` function, to log out
 the request sent to the service, and its response. The logger must be an object
 with an `info()` and an `error()` function. Both should accept a string message
 as first argument, and a meta object as the second.
+
+Available endpoint options:
+
+- `uri`: The uri to send requests to for this endpoint.
+- `baseUri`: An option base uri prepended to `uri`.
+- `headers`: An object of headers to set on the request.
+- `method`: Override the http method used to send the request. Default is `PUT`
+  when the request has a body, otherwise `GET`.
+- `authAsQuery`: Set to `true` to include auth options in query string rather
+  than as request headers. Default is `false`.
+- `retries`: Number of times to retry a request. Default is `0`.
+- `timeout`: Milliseconds to wait until a request is timed out. Default is
+  `60000`.
 
 ### Running the tests
 

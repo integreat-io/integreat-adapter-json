@@ -4,10 +4,10 @@ import nock = require('nock')
 
 import json from '..'
 
-test('should log request and response', async t => {
+test('should log request and response', async (t) => {
   const logger = {
     info: sinon.stub(),
-    error: sinon.stub()
+    error: sinon.stub(),
   }
   const adapter = json(logger)
   nock('http://json1.test')
@@ -17,7 +17,7 @@ test('should log request and response', async t => {
     action: 'SET',
     data: JSON.stringify([{ id: 'ent1', type: 'entry' }]),
     endpoint: adapter.prepareEndpoint({ uri: 'http://json1.test/entries' }),
-    params: { type: 'entry' }
+    params: { type: 'entry' },
   }
   const expectedPreMessage = 'Sending PUT http://json1.test/entries'
   const expectedPreMeta = {
@@ -25,12 +25,13 @@ test('should log request and response', async t => {
     uri: 'http://json1.test/entries',
     body: request.data,
     headers: { 'Content-Type': 'application/json' },
-    retries: 0
+    retries: 0,
+    timeout: 60000,
   }
   const expectedPostMessage = 'Success from PUT http://json1.test/entries'
   const expectedPostMeta = {
     status: 'ok',
-    data: JSON.stringify({ ok: true })
+    data: JSON.stringify({ ok: true }),
   }
 
   await adapter.send(request)
@@ -45,10 +46,10 @@ test('should log request and response', async t => {
   nock.restore()
 })
 
-test('should log error response', async t => {
+test('should log error response', async (t) => {
   const logger = {
     info: sinon.stub(),
-    error: sinon.stub()
+    error: sinon.stub(),
   }
   const adapter = json(logger)
   nock('http://json2.test')
@@ -58,12 +59,13 @@ test('should log error response', async t => {
     action: 'SET',
     data: JSON.stringify([{ id: 'ent1', type: 'entry' }]),
     endpoint: adapter.prepareEndpoint({ uri: 'http://json2.test/entries' }),
-    params: { type: 'entry' }
+    params: { type: 'entry' },
   }
-  const expectedPostMessage = 'Error \'notfound\' from PUT http://json2.test/entries: Could not find the url http://json2.test/entries'
+  const expectedPostMessage =
+    "Error 'notfound' from PUT http://json2.test/entries: Could not find the url http://json2.test/entries"
   const expectedPostMeta = {
     status: 'notfound',
-    error: 'Could not find the url http://json2.test/entries'
+    error: 'Could not find the url http://json2.test/entries',
   }
 
   await adapter.send(request)
