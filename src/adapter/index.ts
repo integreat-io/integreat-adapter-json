@@ -236,7 +236,7 @@ export default (logger?: Logger) => ({
     )
     const method = selectMethod(endpoint, data)
     const retries = endpoint.retries ?? 0
-    const timeout = endpoint.timeout ?? 60000
+    const timeout = endpoint.timeout ?? 120000
     const headers = createHeaders(
       endpoint,
       data !== undefined,

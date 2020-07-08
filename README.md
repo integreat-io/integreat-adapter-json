@@ -69,7 +69,7 @@ Available endpoint options:
   than as request headers. Default is `false`.
 - `retries`: Number of times to retry a request. Default is `0`.
 - `timeout`: Milliseconds to wait until a request is timed out. Default is
-  `60000`.
+  `120000`.
 
 ### Running the tests
 

@@ -455,7 +455,7 @@ test('should return request props on dry-run', async (t) => {
     method: 'PUT',
     body: data,
     retries: 0,
-    timeout: 60000,
+    timeout: 120000,
     headers: {
       'Content-Type': 'application/json',
     },

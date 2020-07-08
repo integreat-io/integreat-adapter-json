@@ -26,7 +26,7 @@ test('should log request and response', async (t) => {
     body: request.data,
     headers: { 'Content-Type': 'application/json' },
     retries: 0,
-    timeout: 60000,
+    timeout: 120000,
   }
   const expectedPostMessage = 'Success from PUT http://json1.test/entries'
   const expectedPostMeta = {
