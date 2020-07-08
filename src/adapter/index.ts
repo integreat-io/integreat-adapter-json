@@ -1,4 +1,5 @@
-const debug = require('debug')('great:adapter:json')
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import debugFn = require('debug')
 import { Method } from 'got'
 import {
   compile as compileUri,
@@ -6,7 +7,11 @@ import {
 } from 'great-uri-template'
 import sendToService from './sendToService'
 
-type DataProperty = string | number | boolean | object
+const debug = debugFn('great:adapter:json')
+
+type Connection = Record<string, unknown>
+
+type DataProperty = string | number | boolean | Record<string, unknown>
 
 interface Data {
   [key: string]: DataProperty
@@ -15,32 +20,30 @@ interface Data {
 export type RequestData = Data | Data[] | DataProperty | null
 
 interface Params {
-  [key: string]: any
+  [key: string]: DataProperty
 }
 
-export interface Headers {
-  [key: string]: string
-}
+export type Headers = Record<string, string>
 
 export interface Request {
   action: string
   data?: string | RequestData
   endpoint?: CompiledOptions
   params?: Params
-  headers?: object
-  auth?: object | boolean | null
+  headers?: Headers
+  auth?: Record<string, string | number> | boolean | null
 }
 
 export interface Response {
   status: string
-  data?: any
+  data?: Data | Data[] | DataProperty | null
   error?: string
 }
 
 export interface Options {
   baseUri?: string | null
   uri?: string
-  headers?: Headers | {}
+  headers?: Headers
   method?: Method
   retries?: number
   timeout?: number
@@ -50,8 +53,8 @@ export interface Options {
 
 export interface CompiledOptions {
   baseUri?: string | null
-  uri?: (string | object)[]
-  headers?: Headers | {}
+  uri?: (string | Record<string, unknown>)[]
+  headers?: Headers
   method?: Method
   retries?: number
   timeout?: number
@@ -60,18 +63,18 @@ export interface CompiledOptions {
 }
 
 export interface Logger {
-  info: (...args: any[]) => void
-  error: (...args: any[]) => void
+  info: (...args: unknown[]) => void
+  error: (...args: unknown[]) => void
 }
 
 export interface SendOptions {
   uri: string
   method: Method
   body?: string
-  headers: Headers | {}
+  headers: Headers
   retries?: number
   timeout?: number
-  auth?: object | boolean | null
+  auth?: Record<string, unknown> | boolean | null
 }
 
 const selectMethod = (endpoint: CompiledOptions, data?: string | RequestData) =>
@@ -83,8 +86,8 @@ const isValidData = (data?: string | RequestData): data is string | undefined =>
 const createHeaders = (
   endpoint: CompiledOptions,
   hasData: boolean,
-  headers?: object,
-  auth?: object | boolean | null
+  headers?: Headers,
+  auth?: Record<string, unknown> | boolean | null
 ) => ({
   ...(hasData ? { 'Content-Type': 'application/json' } : {}),
   ...endpoint.headers,
@@ -94,7 +97,10 @@ const createHeaders = (
 
 const createQueryString = (params: Params) =>
   Object.keys(params)
-    .map((key) => `${key.toLowerCase()}=${encodeURIComponent(params[key])}`)
+    .map(
+      // eslint-disable-next-line security/detect-object-injection
+      (key) => `${key.toLowerCase()}=${encodeURIComponent(String(params[key]))}`
+    )
     .join('&')
 
 const appendQueryParams = (uri: string, params: Params) =>
@@ -106,7 +112,7 @@ const removeDanglingQuestionMark = (uri: string) =>
 const addAuthToUri = (
   uri: string,
   endpoint: CompiledOptions,
-  auth?: object | boolean | null
+  auth?: Record<string, string | number> | boolean | null
 ) => {
   if (uri && endpoint.authAsQuery === true && auth && auth !== true) {
     return appendQueryParams(removeDanglingQuestionMark(uri), auth)
@@ -183,8 +189,8 @@ export default (logger?: Logger) => ({
    */
   connect: async (
     _serviceOptions: Options,
-    _auth: object | null,
-    connection: object | null
+    _auth: Record<string, unknown> | null,
+    connection: Connection | null
   ) => connection,
 
   /**
@@ -209,7 +215,7 @@ export default (logger?: Logger) => ({
    */
   async send(
     { endpoint, data, auth, params = {}, headers: reqHeaders }: Request,
-    _connection?: object | null
+    _connection?: Connection | null
   ): Promise<Response> {
     if (!endpoint || !endpoint.uri) {
       return { status: 'error', error: 'No endpoint specified in the request' }
@@ -262,7 +268,7 @@ export default (logger?: Logger) => ({
     try {
       return {
         ...response,
-        data: typeof data !== 'object' ? JSON.parse(data) : data,
+        data: typeof data === 'string' ? JSON.parse(data) : data,
       }
     } catch (error) {
       return {
@@ -276,7 +282,7 @@ export default (logger?: Logger) => ({
    * Disconnect from service.
    * For the json adapter, this will do nothing.
    */
-  disconnect: async (_connection: {} | null) => {
+  disconnect: async (_connection: Connection | null) => {
     return
   },
 })

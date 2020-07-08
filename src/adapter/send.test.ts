@@ -1,7 +1,7 @@
 import test from 'ava'
 import nock = require('nock')
 
-import json from '.'
+import json, { Request } from '.'
 const adapter = json()
 
 // Setup
@@ -499,17 +499,17 @@ test('should should set retries and timeout from endpiont', async (t) => {
 })
 
 test('should return error when no endpoint', async (t) => {
-  const request = {}
+  const request = {} as Request
 
-  const ret = await adapter.send(request as any)
+  const ret = await adapter.send(request)
 
   t.is(ret.status, 'error')
 })
 
 test('should return error when no uri', async (t) => {
-  const request = { endpoint: { uri: undefined } }
+  const request = { endpoint: { uri: undefined } } as Request
 
-  const ret = await adapter.send(request as any)
+  const ret = await adapter.send(request)
 
   t.is(ret.status, 'error')
 })

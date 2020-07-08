@@ -1,4 +1,7 @@
 declare module 'great-uri-template' {
-  function compile (template: string): (object | string)[]
-  function generate (compiled: object, params: object): string
+  function compile(template: string): (Record<string, unknown> | string)[]
+  function generate(
+    compiled: (string | Record<string, unknown>)[],
+    params: Record<string, unknown> | boolean
+  ): string
 }

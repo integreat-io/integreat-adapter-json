@@ -1,5 +1,5 @@
 import got, { HTTPError } from 'got'
-import { SendOptions } from '.'
+import { Response, SendOptions } from '.'
 
 const extractFromError = (error: HTTPError | Error) =>
   error instanceof HTTPError
@@ -48,7 +48,9 @@ async function handleError(
   return response
 }
 
-export default async function sendToService(sendOptions: SendOptions) {
+export default async function sendToService(
+  sendOptions: SendOptions
+): Promise<Response> {
   const { uri, method, body, headers, retries, timeout } = sendOptions
 
   try {
