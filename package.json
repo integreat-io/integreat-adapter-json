@@ -62,7 +62,7 @@
     "@types/got": "^9.6.11",
     "debug": "^4.1.1",
     "got": "^10.7.0",
-    "great-uri-template": "^0.1.5"
+    "great-uri-template": "^0.1.6"
   },
   "devDependencies": {
     "@types/sinon": "^9.0.4",
