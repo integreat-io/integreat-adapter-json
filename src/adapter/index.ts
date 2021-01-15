@@ -270,10 +270,10 @@ export default (logger?: Logger) => ({
         ...response,
         data: typeof data === 'string' ? JSON.parse(data) : data,
       }
-    } catch (error) {
+    } catch {
       return {
-        status: 'badresponse',
-        error: 'Response data is not valid JSON',
+        ...response,
+        data: { value: data },
       }
     }
   },

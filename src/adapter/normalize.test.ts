@@ -10,11 +10,12 @@ const request = { action: 'GET' }
 // Tests
 
 test('should normalize response', async (t) => {
-  const data = '{ "id": "ent1", "type": "entry", "attributes": { "title": "Entry 1" } }'
+  const data =
+    '{ "id": "ent1", "type": "entry", "attributes": { "title": "Entry 1" } }'
   const response = { status: 'ok', data }
   const expected = {
     status: 'ok',
-    data: { id: 'ent1', type: 'entry', attributes: { title: 'Entry 1' } }
+    data: { id: 'ent1', type: 'entry', attributes: { title: 'Entry 1' } },
   }
 
   const ret = await adapter.normalize(response, request)
@@ -51,7 +52,7 @@ test('should normalize empty string as null', async (t) => {
 test('should not touch data object when already parsed', async (t) => {
   const response = {
     status: 'ok',
-    data: { id: 'ent1', type: 'entry', attributes: { title: 'Entry 1' } }
+    data: { id: 'ent1', type: 'entry', attributes: { title: 'Entry 1' } },
   }
 
   const ret = await adapter.normalize(response, request)
@@ -62,7 +63,7 @@ test('should not touch data object when already parsed', async (t) => {
 test('should not touch data array when already parsed', async (t) => {
   const response = {
     status: 'ok',
-    data: [{ id: 'ent1', type: 'entry', attributes: { title: 'Entry 1' } }]
+    data: [{ id: 'ent1', type: 'entry', attributes: { title: 'Entry 1' } }],
   }
 
   const ret = await adapter.normalize(response, request)
@@ -70,14 +71,14 @@ test('should not touch data array when already parsed', async (t) => {
   t.deepEqual(ret, response)
 })
 
-test('should return error on invalid json', async (t) => {
+test('should return primitive value on object', async (t) => {
   const response = {
     status: 'ok',
-    data: 'invalid'
+    data: 'Ok',
   }
   const expected = {
-    status: 'badresponse',
-    error: 'Response data is not valid JSON'
+    status: 'ok',
+    data: { value: 'Ok' },
   }
 
   const ret = await adapter.normalize(response, request)
