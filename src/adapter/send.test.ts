@@ -458,6 +458,7 @@ test('should return request props on dry-run', async (t) => {
     timeout: 120000,
     headers: {
       'Content-Type': 'application/json',
+      'user-agent': 'integreat-adapter-json/0.4',
     },
   }
 
@@ -489,6 +490,7 @@ test('should should set retries and timeout from endpiont', async (t) => {
     timeout: 30000,
     headers: {
       'Content-Type': 'application/json',
+      'user-agent': 'integreat-adapter-json/0.4',
     },
   }
 

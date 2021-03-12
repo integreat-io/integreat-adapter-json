@@ -33,3 +33,27 @@ test('should prepare, serialize, send, and normalize', async (t) => {
 
   nock.restore()
 })
+
+test('should call with Integreat as user-agent', async (t) => {
+  const adapter = json()
+  const scope = nock('http://json2.test', {
+    reqheaders: {
+      'user-agent': 'integreat-adapter-json/0.4',
+    },
+  })
+    .get('/entries')
+    .reply(200, { ok: true })
+  const request = {
+    action: 'GET',
+    endpoint: adapter.prepareEndpoint({ uri: 'http://json2.test/entries' }),
+    params: { type: 'entry' },
+  }
+
+  // We skip normalization and serialization here, as we're just interested in
+  // seeing that we call with the right user-agent
+  await adapter.send(request)
+
+  t.true(scope.isDone())
+
+  nock.restore()
+})

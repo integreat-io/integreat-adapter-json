@@ -90,6 +90,7 @@ const createHeaders = (
   headers?: Headers,
   auth?: Record<string, unknown> | boolean | null
 ) => ({
+  'user-agent': 'integreat-adapter-json/0.4',
   ...(hasData ? { 'Content-Type': 'application/json' } : {}),
   ...endpoint.headers,
   ...headers,

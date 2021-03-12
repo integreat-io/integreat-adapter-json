@@ -24,7 +24,10 @@ test('should log request and response', async (t) => {
     method: 'PUT',
     uri: 'http://json1.test/entries',
     body: request.data,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'user-agent': 'integreat-adapter-json/0.4',
+    },
     retries: 0,
     timeout: 120000,
   }
