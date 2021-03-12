@@ -11,11 +11,12 @@ test('should prepare, serialize, send, and normalize', async (t) => {
   const request = {
     action: 'GET',
     endpoint: json.prepareEndpoint({ uri: 'http://json1.test/entries/{id}' }),
-    params: { type: 'entry', id: 'ent1' }
+    params: { type: 'entry', id: 'ent1' },
   }
   const expected = {
     status: 'ok',
-    data: { id: 'ent1', type: 'entry', attributes: { title: 'Entry 1' } }
+    data: { id: 'ent1', type: 'entry', attributes: { title: 'Entry 1' } },
+    headers: { 'content-type': 'application/json' },
   }
 
   const serialized = await json.serialize(request)

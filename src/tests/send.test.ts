@@ -7,16 +7,21 @@ test('should prepare, serialize, send, and normalize', async (t) => {
   const adapter = json()
   const scope = nock('http://json1.test')
     .put('/entries', '[{"id":"ent1","type":"entry"}]')
-    .reply(200, { ok: true })
+    .reply(
+      200,
+      { ok: true },
+      { 'Content-Type': 'application/json; charset=utf-8' }
+    )
   const request = {
     action: 'SET',
     data: [{ id: 'ent1', type: 'entry' }],
     endpoint: adapter.prepareEndpoint({ uri: 'http://json1.test/entries' }),
-    params: { type: 'entry' }
+    params: { type: 'entry' },
   }
   const expected = {
     status: 'ok',
-    data: { ok: true }
+    data: { ok: true },
+    headers: { 'content-type': 'application/json; charset=utf-8' },
   }
 
   const serialized = await adapter.serialize(request)

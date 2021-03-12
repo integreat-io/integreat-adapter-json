@@ -37,6 +37,7 @@ export interface Request {
 export interface Response {
   status: string
   data?: Data | Data[] | DataProperty | null
+  headers?: Record<string, string>
   error?: string
 }
 

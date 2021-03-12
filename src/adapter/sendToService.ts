@@ -61,7 +61,11 @@ export default async function sendToService(
       retry: retries,
       timeout,
     })
-    return { status: 'ok', data: response.body }
+    return {
+      status: 'ok',
+      data: response.body,
+      headers: response.headers as Record<string, string>,
+    }
   } catch (err) {
     return handleError(sendOptions, err)
   }

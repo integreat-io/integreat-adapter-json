@@ -32,6 +32,7 @@ test('should log request and response', async (t) => {
   const expectedPostMeta = {
     status: 'ok',
     data: JSON.stringify({ ok: true }),
+    headers: { 'content-type': 'application/json' },
   }
 
   await adapter.send(request)
