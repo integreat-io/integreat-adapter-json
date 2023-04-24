@@ -1,49 +1,29 @@
 {
   "name": "integreat-adapter-json",
-  "version": "0.4.1",
+  "version": "0.5.0-alpha.0",
   "description": "JSON adapter for Integreat",
+  "author": "Kjell-Morten Bratsberg Thorsen <kjellmorten@integreat.io> (https://integreat.io/)",
+  "license": "ISC",
   "keywords": [
     "json",
     "integreat"
   ],
-  "author": "Kjell-Morten Bratsberg Thorsen <post@kjellmorten.no>",
-  "license": "ISC",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
-    "start": "tsc && node dist/index.js",
-    "test": "npm run lint && tsc && nyc --reporter=text-summary ava dist/**/*.test.js",
-    "test:watch": "npm run dev",
+    "test": "npm run lint && npm run build && c8 --reporter=text-summary ava --config ./ava-dist.config.cjs",
     "test:inspect": "node --inspect node_modules/ava/profile.js",
-    "dev": "ava --watch src/**/*.test.ts",
+    "test:watch": "npm run dev",
+    "dev": "ava --watch",
     "build": "tsc",
-    "prepare": "npm run build",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "nyc:report": "nyc report",
+    "prepublish": "npm run build",
+    "coverage": "c8 report",
     "lint": "eslint --ext .ts src"
-  },
-  "ava": {
-    "extensions": [
-      "ts",
-      "js"
-    ],
-    "require": [
-      "ts-node/register/transpile-only"
-    ],
-    "files": [
-      "dist/**/*.test.js",
-      "src/**/*.test.ts"
-    ]
-  },
-  "nyc": {
-    "extension": [
-      ".ts",
-      ".js"
-    ],
-    "exclude": [
-      "**/*.test.js",
-      "**/*.test.ts"
-    ]
   },
   "repository": {
     "type": "git",
@@ -54,32 +34,14 @@
   },
   "homepage": "https://github.com/integreat-io/integreat-adapter-json#readme",
   "engines": {
-    "node": ">= 8.6",
-    "npm": ">= 5.4"
+    "node": ">= 18"
   },
-  "dependencies": {
-    "@types/debug": "^4.1.5",
-    "@types/got": "^9.6.11",
-    "debug": "^4.3.2",
-    "got": "^11.8.2",
-    "great-uri-template": "^0.1.6"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/sinon": "^9.0.11",
-    "@typescript-eslint/eslint-plugin": "^4.17.0",
-    "@typescript-eslint/parser": "^4.17.0",
-    "ava": "^3.15.0",
-    "coveralls": "^3.1.0",
-    "eslint": "^7.21.0",
-    "eslint-config-prettier": "^7.2.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.3.1",
-    "eslint-plugin-security": "^1.4.0",
-    "nock": "^13.0.11",
-    "nyc": "^15.1.0",
-    "prettier": "^2.2.1",
-    "sinon": "^9.2.4",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.2.3"
+    "@integreat/ts-dev-setup": "^4.0.1",
+    "@types/sinon": "^10.0.14",
+    "integreat": "^0.8.0-rc.2",
+    "nock": "^13.3.0",
+    "sinon": "^15.0.4"
   }
 }

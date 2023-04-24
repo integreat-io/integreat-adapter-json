@@ -1,7 +1,7 @@
 src/
-*.test.js
-*.test.d.ts
-*.map
+coverage/
+dist/tests/
+*.test*
 .*
 tsconfig.json
-tslint.json
+*.config.js

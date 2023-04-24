@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "target": "es2022",
+    "lib": ["es2022"],
+    "module": "node16",
+    "moduleResolution": "node16",
+    "moduleDetection": "force",
     "declaration": true,
+    "resolveJsonModule": false,
     "sourceMap": true,
-    "outDir": "./dist",
     "noEmitOnError": false,
     "strict": true,
     "noImplicitAny": true,
@@ -14,15 +16,18 @@
     "strictNullChecks": true,
     "noImplicitReturns": true,
     "alwaysStrict": true,
+    "skipLibCheck": true,
     "removeComments": true,
     "baseUrl": ".",
     "paths": {
-      "*": [
-        "node_modules/*"
-      ]
-    }
+      "*": ["node_modules/*"]
+    },
+    "outDir": "./dist"
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"],
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true,
+    "experimentalResolver": true
+  }
 }

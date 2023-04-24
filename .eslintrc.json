@@ -6,7 +6,6 @@
   "extends": [
     "plugin:@typescript-eslint/recommended",
     "prettier",
-    "prettier/@typescript-eslint",
     "plugin:promise/recommended",
     "plugin:security/recommended"
   ],
@@ -19,7 +18,7 @@
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "promise", "security", "node"],
+  "plugins": ["@typescript-eslint", "promise", "security", "node", "ava"],
   "rules": {
     "@typescript-eslint/explicit-function-return-type": 0,
     "no-unused-vars": "off",
@@ -33,5 +32,14 @@
         "tryExtensions": [".js", ".json", ".ts"]
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.test.ts", "*.test.js"],
+      "rules": {
+        "node/no-extraneous-import": "off"
+      }
+    }
+  ],
+  "reportUnusedDisableDirectives": true
 }
