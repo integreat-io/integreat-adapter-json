@@ -7,7 +7,7 @@ export interface Options extends Record<string, unknown> {
 
 function normalizeJson(data: unknown) {
   if (typeof data === 'string') {
-    return JSON.parse(data)
+    return data === '' ? null : JSON.parse(data)
   } else {
     return data
   }
@@ -29,12 +29,12 @@ const setActionData = (
   ...action,
   payload: {
     ...action.payload,
-    ...(payloadData ? { data: payloadData } : {}),
+    ...(payloadData === undefined ? {} : { data: payloadData }),
   },
   ...(action.response && {
     response: {
       ...action.response,
-      ...(responseData ? { data: responseData } : {}),
+      ...(responseData === undefined ? {} : { data: responseData }),
     },
   }),
 })

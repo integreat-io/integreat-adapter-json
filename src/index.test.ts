@@ -72,6 +72,25 @@ test('should normalize json string data in payload', async (t) => {
   t.deepEqual(ret, expected)
 })
 
+test('should normalize empty json string as null', async (t) => {
+  const action = {
+    type: 'GET',
+    payload: { type: 'entry' },
+    response: { status: 'ok', data: '' },
+    meta: { ident: { id: 'johnf' } },
+  }
+  const expected = {
+    type: 'GET',
+    payload: { type: 'entry' },
+    response: { status: 'ok', data: null },
+    meta: { ident: { id: 'johnf' } },
+  }
+
+  const ret = await adapter.normalize(action, options)
+
+  t.deepEqual(ret, expected)
+})
+
 test('should return error when parsing response data fails', async (t) => {
   const action = {
     type: 'GET',
