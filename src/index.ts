@@ -39,16 +39,39 @@ const setActionData = (
   }),
 })
 
-const setJSONHeaders = (action: Action) => ({
-  ...action,
-  meta: {
-    ...action.meta,
-    headers: {
-      ...(action.meta?.headers || {}),
-      'Content-Type': 'application/json',
-    },
-  },
-})
+const removeContentType = (
+  headers: Record<string, string | string[] | undefined>
+) =>
+  Object.fromEntries(
+    Object.entries(headers).filter(
+      ([key]) => key.toLowerCase() !== 'content-type'
+    )
+  )
+
+// Set on headers on payload for outgoing action, and on response for incoming
+// action
+const setJSONHeaders = (action: Action) =>
+  action.payload.sourceService
+    ? {
+        ...action,
+        response: {
+          ...action.response,
+          headers: {
+            ...removeContentType(action.response?.headers || {}),
+            'Content-Type': 'application/json',
+          },
+        },
+      }
+    : {
+        ...action,
+        payload: {
+          ...action.payload,
+          headers: {
+            ...removeContentType(action.payload.headers || {}),
+            'Content-Type': 'application/json',
+          },
+        },
+      }
 
 const adapter: Adapter = {
   prepareOptions({ includeHeaders = false }: Options, _serviceId) {

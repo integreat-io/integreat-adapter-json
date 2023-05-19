@@ -30,17 +30,17 @@ Example of use:
 import integreat from 'integreat'
 import httpTransporter from 'integreat-transporter-http'
 import jsonAdapter from 'integreat-adapter-json'
-const defs = require('./config')
+import defs from './config.js'
 
-const great = Integreat.create(
-  { schemas, services },
-  { transporters: { http: httpTransporter }, adapters: { json: jsonAdapter } }
-)
+const great = Integreat.create(defs, {
+  transporters: { http: httpTransporter },
+  adapters: { json: jsonAdapter },
+})
 
 // ... and then dispatch actions as usual
 ```
 
-Example source configuration:
+Example service configuration:
 
 ```javascript
 {

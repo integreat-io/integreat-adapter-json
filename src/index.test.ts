@@ -199,7 +199,32 @@ test('should not serialize null or undefined', async (t) => {
   t.deepEqual(ret, expected)
 })
 
-test('should include JSON headers', async (t) => {
+test('should include JSON headers in payload on outgoing service', async (t) => {
+  const options = { includeHeaders: true }
+  const action = {
+    type: 'GET',
+    payload: { type: 'entry' },
+    response: { status: 'ok', data: [{ id: 'ent1', title: 'Entry 1' }] },
+    meta: { ident: { id: 'johnf' } },
+  }
+  const expected = {
+    type: 'GET',
+    payload: {
+      type: 'entry',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+    response: { status: 'ok', data: '[{"id":"ent1","title":"Entry 1"}]' },
+    meta: { ident: { id: 'johnf' } },
+  }
+
+  const ret = await adapter.serialize(action, options)
+
+  t.deepEqual(ret, expected)
+})
+
+test('should include JSON headers in resonse on incoming request', async (t) => {
   const options = { includeHeaders: true }
   const action = {
     type: 'GET',
@@ -209,14 +234,43 @@ test('should include JSON headers', async (t) => {
   }
   const expected = {
     type: 'GET',
-    payload: { type: 'entry', sourceService: 'api' },
-    response: { status: 'ok', data: '[{"id":"ent1","title":"Entry 1"}]' },
-    meta: {
-      ident: { id: 'johnf' },
+    payload: {
+      type: 'entry',
+      sourceService: 'api',
+    },
+    response: {
+      status: 'ok',
+      data: '[{"id":"ent1","title":"Entry 1"}]',
       headers: {
         'Content-Type': 'application/json',
       },
     },
+    meta: { ident: { id: 'johnf' } },
+  }
+
+  const ret = await adapter.serialize(action, options)
+
+  t.deepEqual(ret, expected)
+})
+
+test('should replace existing content-type', async (t) => {
+  const options = { includeHeaders: true }
+  const action = {
+    type: 'GET',
+    payload: { type: 'entry', headers: { 'content-type': 'text/plain' } },
+    response: { status: 'ok', data: [{ id: 'ent1', title: 'Entry 1' }] },
+    meta: { ident: { id: 'johnf' } },
+  }
+  const expected = {
+    type: 'GET',
+    payload: {
+      type: 'entry',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+    response: { status: 'ok', data: '[{"id":"ent1","title":"Entry 1"}]' },
+    meta: { ident: { id: 'johnf' } },
   }
 
   const ret = await adapter.serialize(action, options)
