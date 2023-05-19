@@ -1,6 +1,6 @@
 {
   "name": "integreat-adapter-json",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "JSON adapter for Integreat",
   "author": "Kjell-Morten Bratsberg Thorsen <kjellmorten@integreat.io> (https://integreat.io/)",
   "license": "ISC",
