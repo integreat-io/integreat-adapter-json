@@ -4,13 +4,13 @@ import adapter from './index.js'
 
 // Setup
 
-const options = {}
+const options = { includeHeaders: false }
 
 // Tests -- prepareOptions
 
 test('should prepare empty options', (t) => {
   const options = {}
-  const expected = { includeHeaders: false }
+  const expected = { includeHeaders: true }
 
   const ret = adapter.prepareOptions(options, 'api')
 
@@ -18,8 +18,8 @@ test('should prepare empty options', (t) => {
 })
 
 test('should only keep known options', (t) => {
-  const options = { includeHeaders: true, dontKnow: 'whatthisis' }
-  const expected = { includeHeaders: true }
+  const options = { includeHeaders: false, dontKnow: 'whatthisis' }
+  const expected = { includeHeaders: false }
 
   const ret = adapter.prepareOptions(options, 'api')
 
@@ -200,7 +200,7 @@ test('should not serialize null or undefined', async (t) => {
 })
 
 test('should include JSON headers in payload on outgoing service', async (t) => {
-  const options = { includeHeaders: true }
+  const options = {}
   const action = {
     type: 'GET',
     payload: { type: 'entry' },
@@ -225,7 +225,7 @@ test('should include JSON headers in payload on outgoing service', async (t) => 
 })
 
 test('should include JSON headers in resonse on incoming request', async (t) => {
-  const options = { includeHeaders: true }
+  const options = {}
   const action = {
     type: 'GET',
     payload: { type: 'entry', sourceService: 'api' },
@@ -254,7 +254,7 @@ test('should include JSON headers in resonse on incoming request', async (t) => 
 })
 
 test('should replace existing content-type', async (t) => {
-  const options = { includeHeaders: true }
+  const options = {}
   const action = {
     type: 'GET',
     payload: { type: 'entry', headers: { 'content-type': 'text/plain' } },

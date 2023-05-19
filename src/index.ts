@@ -74,7 +74,7 @@ const setJSONHeaders = (action: Action) =>
       }
 
 const adapter: Adapter = {
-  prepareOptions({ includeHeaders = false }: Options, _serviceId) {
+  prepareOptions({ includeHeaders = true }: Options, _serviceId) {
     return { includeHeaders }
   },
 
@@ -103,13 +103,13 @@ const adapter: Adapter = {
     return setActionData(action, payloadData, responseData)
   },
 
-  async serialize(action, options: Options) {
+  async serialize(action, { includeHeaders = true }: Options) {
     const payloadData = serializeJSON(action.payload.data)
     const responseData = serializeJSON(action.response?.data)
 
     const ret = setActionData(action, payloadData, responseData)
 
-    return options.includeHeaders ? setJSONHeaders(ret) : ret
+    return includeHeaders ? setJSONHeaders(ret) : ret
   },
 }
 

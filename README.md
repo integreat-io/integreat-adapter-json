@@ -56,8 +56,8 @@ Example service configuration:
 }
 ```
 
-Data headers for sending with content-type `application/json`, will be set when
-you set the `includeHeaders` option to `true`.
+Data headers for sending with content-type `application/json` will be set unless
+you set the `includeHeaders` option to `false`. It's `true` by default.
 
 ### Running the tests
 
