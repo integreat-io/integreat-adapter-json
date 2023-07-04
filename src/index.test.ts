@@ -285,16 +285,20 @@ test('should include JSON headers in payload on outgoing service even when sourc
   t.deepEqual(ret, expected)
 })
 
-test('should replace existing content-type', async (t) => {
+test('should not replace existing content-type', async (t) => {
   const options = {}
   const action = {
     type: 'GET',
     payload: {
       type: 'entry',
+      headers: { 'Content-Type': 'text/plain' },
+      data: [{ id: 'ent1', title: 'Entry 1' }],
+    },
+    response: {
+      status: 'ok',
       headers: { 'content-type': 'text/plain' },
       data: [{ id: 'ent1', title: 'Entry 1' }],
     },
-    response: { status: 'ok' },
     meta: { ident: { id: 'johnf' } },
   }
   const expected = {
@@ -303,10 +307,14 @@ test('should replace existing content-type', async (t) => {
       type: 'entry',
       data: '[{"id":"ent1","title":"Entry 1"}]',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'text/plain',
       },
     },
-    response: { status: 'ok' },
+    response: {
+      status: 'ok',
+      headers: { 'Content-Type': 'text/plain' },
+      data: '[{"id":"ent1","title":"Entry 1"}]',
+    },
     meta: { ident: { id: 'johnf' } },
   }
 

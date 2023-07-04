@@ -39,14 +39,30 @@ const setActionData = (
   }),
 })
 
-const removeContentType = (
-  headers: Record<string, string | string[] | undefined>
-) =>
-  Object.fromEntries(
-    Object.entries(headers).filter(
-      ([key]) => key.toLowerCase() !== 'content-type'
-    )
+function removeContentKeyWithWrongCase(
+  headers: Record<string, string | string[] | undefined>,
+  key?: string
+) {
+  if (typeof key === 'string' && key !== 'Content-Type') {
+    delete headers[key] // eslint-disable-line security/detect-object-injection
+  }
+  return headers
+}
+
+function setContentType(
+  defaultType: string,
+  headers: Record<string, string | string[] | undefined> = {}
+) {
+  const contentKey = Object.keys(headers).find(
+    (key) => key.toLowerCase() === 'content-type'
   )
+  const contentType =
+    (typeof contentKey === 'string' && headers[contentKey]) || defaultType // eslint-disable-line security/detect-object-injection
+  return removeContentKeyWithWrongCase(
+    { ...headers, 'Content-Type': contentType },
+    contentKey
+  )
+}
 
 // Set on headers on payload for outgoing action, and on response for incoming
 // action
@@ -55,19 +71,13 @@ const setJSONHeaders = (action: Action) => ({
   payload: action.payload.data
     ? {
         ...action.payload,
-        headers: {
-          ...removeContentType(action.payload.headers || {}),
-          'Content-Type': 'application/json',
-        },
+        headers: setContentType('application/json', action.payload.headers),
       }
     : action.payload,
   response: action.response?.data
     ? {
         ...action.response,
-        headers: {
-          ...removeContentType(action.response?.headers || {}),
-          'Content-Type': 'application/json',
-        },
+        headers: setContentType('application/json', action.response?.headers),
       }
     : action.response,
 })
