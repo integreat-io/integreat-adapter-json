@@ -50,28 +50,27 @@ const removeContentType = (
 
 // Set on headers on payload for outgoing action, and on response for incoming
 // action
-const setJSONHeaders = (action: Action) =>
-  action.payload.sourceService
+const setJSONHeaders = (action: Action) => ({
+  ...action,
+  payload: action.payload.data
     ? {
-        ...action,
-        response: {
-          ...action.response,
-          headers: {
-            ...removeContentType(action.response?.headers || {}),
-            'Content-Type': 'application/json',
-          },
+        ...action.payload,
+        headers: {
+          ...removeContentType(action.payload.headers || {}),
+          'Content-Type': 'application/json',
         },
       }
-    : {
-        ...action,
-        payload: {
-          ...action.payload,
-          headers: {
-            ...removeContentType(action.payload.headers || {}),
-            'Content-Type': 'application/json',
-          },
+    : action.payload,
+  response: action.response?.data
+    ? {
+        ...action.response,
+        headers: {
+          ...removeContentType(action.response?.headers || {}),
+          'Content-Type': 'application/json',
         },
       }
+    : action.response,
+})
 
 const adapter: Adapter = {
   prepareOptions({ includeHeaders = true }: Options, _serviceId) {

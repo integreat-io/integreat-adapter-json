@@ -203,19 +203,20 @@ test('should include JSON headers in payload on outgoing service', async (t) => 
   const options = {}
   const action = {
     type: 'GET',
-    payload: { type: 'entry' },
-    response: { status: 'ok', data: [{ id: 'ent1', title: 'Entry 1' }] },
+    payload: { type: 'entry', data: [{ id: 'ent1', title: 'Entry 1' }] },
+    response: { status: 'ok' },
     meta: { ident: { id: 'johnf' } },
   }
   const expected = {
     type: 'GET',
     payload: {
       type: 'entry',
+      data: '[{"id":"ent1","title":"Entry 1"}]',
       headers: {
         'Content-Type': 'application/json',
       },
     },
-    response: { status: 'ok', data: '[{"id":"ent1","title":"Entry 1"}]' },
+    response: { status: 'ok' },
     meta: { ident: { id: 'johnf' } },
   }
 
@@ -253,23 +254,59 @@ test('should include JSON headers in resonse on incoming request', async (t) => 
   t.deepEqual(ret, expected)
 })
 
-test('should replace existing content-type', async (t) => {
+test('should include JSON headers in payload on outgoing service even when sourceService is set', async (t) => {
   const options = {}
   const action = {
     type: 'GET',
-    payload: { type: 'entry', headers: { 'content-type': 'text/plain' } },
-    response: { status: 'ok', data: [{ id: 'ent1', title: 'Entry 1' }] },
+    payload: {
+      type: 'entry',
+      data: [{ id: 'ent1', title: 'Entry 1' }],
+      sourceService: 'api',
+    },
+    response: { status: 'ok' },
     meta: { ident: { id: 'johnf' } },
   }
   const expected = {
     type: 'GET',
     payload: {
       type: 'entry',
+      data: '[{"id":"ent1","title":"Entry 1"}]',
+      sourceService: 'api',
       headers: {
         'Content-Type': 'application/json',
       },
     },
-    response: { status: 'ok', data: '[{"id":"ent1","title":"Entry 1"}]' },
+    response: { status: 'ok' },
+    meta: { ident: { id: 'johnf' } },
+  }
+
+  const ret = await adapter.serialize(action, options)
+
+  t.deepEqual(ret, expected)
+})
+
+test('should replace existing content-type', async (t) => {
+  const options = {}
+  const action = {
+    type: 'GET',
+    payload: {
+      type: 'entry',
+      headers: { 'content-type': 'text/plain' },
+      data: [{ id: 'ent1', title: 'Entry 1' }],
+    },
+    response: { status: 'ok' },
+    meta: { ident: { id: 'johnf' } },
+  }
+  const expected = {
+    type: 'GET',
+    payload: {
+      type: 'entry',
+      data: '[{"id":"ent1","title":"Entry 1"}]',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+    response: { status: 'ok' },
     meta: { ident: { id: 'johnf' } },
   }
 
