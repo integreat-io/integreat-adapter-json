@@ -13,6 +13,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./transformer.js": {
+      "import": "./dist/transformer.js",
+      "types": "./dist/transformer.d.ts"
     }
   },
   "scripts": {
