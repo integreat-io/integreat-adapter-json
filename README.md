@@ -5,9 +5,6 @@ Adapter that lets
 in JSON.
 
 [![npm Version](https://img.shields.io/npm/v/integreat-adapter-json.svg)](https://www.npmjs.com/package/integreat-adapter-json)
-[![Build Status](https://travis-ci.org/integreat-io/integreat-adapter-json.svg?branch=master)](https://travis-ci.org/integreat-io/integreat-adapter-json)
-[![Coverage Status](https://coveralls.io/repos/github/integreat-io/integreat-adapter-json/badge.svg?branch=master)](https://coveralls.io/github/integreat-io/integreat-adapter-json?branch=master)
-[![Dependencies Status](https://tidelift.com/badges/github/integreat-io/integreat-adapter-json?style=flat)](https://tidelift.com/repo/github/integreat-io/integreat-adapter-json)
 [![Maintainability](https://api.codeclimate.com/v1/badges/95c9ac1d21d1ab2424ac/maintainability)](https://codeclimate.com/github/integreat-io/integreat-adapter-json/maintainability)
 
 ## Getting started
@@ -60,6 +57,32 @@ Data headers for sending with content-type `application/json` will be set unless
 you set the `includeHeaders` option to `false` (it's `true` by default). Headers
 will be set where there is data, unless a content-type header is already set.
 The case of the header will always be changed to `'Content-Type'`.
+
+### JSON transformer
+
+The package also includes a transformer, that works exactly like the adapter,
+except it is intended for use in mutation pipelines with
+`{ $transform: 'json' }`. You may use it like this:
+
+Example of use:
+
+```javascript
+import integreat from 'integreat'
+import httpTransporter from 'integreat-transporter-http'
+import jsonTransformer from 'integreat-adapter-json/transformer.js'
+import defs from './config.js'
+
+const great = Integreat.create(defs, {
+  transporters: { http: httpTransporter },
+  transformers: { json: jsonTransformer },
+})
+
+// In a mutation pipeline:
+
+const mutation = ['response.data', { $transform: 'json' }]
+```
+
+The `includeHeaders` option from the adpater, does not apply to the transformer.
 
 ### Running the tests
 
