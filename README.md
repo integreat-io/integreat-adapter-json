@@ -11,7 +11,7 @@ in JSON.
 
 ### Prerequisits
 
-Requires node v18 and Integreat v0.8.
+Requires node v18 and Integreat v1.0.
 
 ### Installing and using
 
@@ -82,7 +82,7 @@ const great = Integreat.create(defs, {
 const mutation = ['response.data', { $transform: 'json' }]
 ```
 
-The `includeHeaders` option from the adpater, does not apply to the transformer.
+The `includeHeaders` option from the adapter, does not apply to the transformer.
 
 ### Running the tests
 
