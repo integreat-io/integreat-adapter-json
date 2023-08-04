@@ -43,8 +43,8 @@
   "dependencies": {},
   "devDependencies": {
     "@integreat/ts-dev-setup": "^4.1.1",
-    "@types/sinon": "^10.0.15",
-    "integreat": "^0.8.9",
+    "@types/sinon": "^10.0.16",
+    "integreat": "^1.0.0",
     "nock": "^13.3.2",
     "sinon": "^15.2.0"
   }
