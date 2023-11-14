@@ -1,4 +1,5 @@
 import type { Action, Adapter } from 'integreat'
+import { isErrorStatus } from './utils/is.js'
 import { setErrorOnAction } from './utils/action.js'
 
 export interface Options extends Record<string, unknown> {
@@ -24,7 +25,7 @@ function serializeJSON(data: unknown) {
 const setActionData = (
   action: Action,
   payloadData: unknown,
-  responseData: unknown
+  responseData: unknown,
 ) => ({
   ...action,
   payload: {
@@ -41,7 +42,7 @@ const setActionData = (
 
 function removeContentKeyWithWrongCase(
   headers: Record<string, string | string[] | undefined>,
-  key?: string
+  key?: string,
 ) {
   if (typeof key === 'string' && key !== 'Content-Type') {
     delete headers[key] // eslint-disable-line security/detect-object-injection
@@ -51,16 +52,16 @@ function removeContentKeyWithWrongCase(
 
 function setContentType(
   defaultType: string,
-  headers: Record<string, string | string[] | undefined> = {}
+  headers: Record<string, string | string[] | undefined> = {},
 ) {
   const contentKey = Object.keys(headers).find(
-    (key) => key.toLowerCase() === 'content-type'
+    (key) => key.toLowerCase() === 'content-type',
   )
   const contentType =
     (typeof contentKey === 'string' && headers[contentKey]) || defaultType // eslint-disable-line security/detect-object-injection
   return removeContentKeyWithWrongCase(
     { ...headers, 'Content-Type': contentType },
-    contentKey
+    contentKey,
   )
 }
 
@@ -82,6 +83,11 @@ const setJSONHeaders = (action: Action) => ({
     : action.response,
 })
 
+const wrapResponseData = (action: Action) => ({
+  ...action,
+  response: { ...action.response, data: { $value: action.response?.data } },
+})
+
 const adapter: Adapter = {
   prepareOptions({ includeHeaders = true }: Options, _serviceId) {
     return { includeHeaders }
@@ -96,17 +102,21 @@ const adapter: Adapter = {
       return setErrorOnAction(
         action,
         'Payload data was not valid JSON',
-        'badrequest'
+        'badrequest',
       )
     }
     try {
       responseData = normalizeJson(action.response?.data)
     } catch {
-      return setErrorOnAction(
-        action,
-        'Response data was not valid JSON',
-        'badresponse'
-      )
+      if (!isErrorStatus(action.response?.status)) {
+        return setErrorOnAction(
+          action,
+          'Response data was not valid JSON',
+          'badresponse',
+        )
+      } else {
+        return wrapResponseData(action)
+      }
     }
 
     return setActionData(action, payloadData, responseData)

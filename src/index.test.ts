@@ -91,6 +91,28 @@ test('should normalize empty json string as null', async (t) => {
   t.deepEqual(ret, expected)
 })
 
+test('should return error when parsing payload data fails', async (t) => {
+  const action = {
+    type: 'GET',
+    payload: { type: 'entry', data: 'Not JSON' },
+    response: { status: 'ok' },
+    meta: { ident: { id: 'johnf' } },
+  }
+  const expected = {
+    type: 'GET',
+    payload: { type: 'entry', data: 'Not JSON' },
+    response: {
+      status: 'badrequest',
+      error: 'Payload data was not valid JSON',
+    },
+    meta: { ident: { id: 'johnf' } },
+  }
+
+  const ret = await adapter.normalize(action, options)
+
+  t.deepEqual(ret, expected)
+})
+
 test('should return error when parsing response data fails', async (t) => {
   const action = {
     type: 'GET',
@@ -114,19 +136,20 @@ test('should return error when parsing response data fails', async (t) => {
   t.deepEqual(ret, expected)
 })
 
-test('should return error when parsing payload data fails', async (t) => {
+test('should not override existing error error with response data parsing error', async (t) => {
   const action = {
     type: 'GET',
-    payload: { type: 'entry', data: 'Not JSON' },
-    response: { status: 'ok' },
+    payload: { type: 'entry' },
+    response: { status: 'timeout', error: 'Too slow!', data: 'Not JSON' },
     meta: { ident: { id: 'johnf' } },
   }
   const expected = {
     type: 'GET',
-    payload: { type: 'entry', data: 'Not JSON' },
+    payload: { type: 'entry' },
     response: {
-      status: 'badrequest',
-      error: 'Payload data was not valid JSON',
+      status: 'timeout',
+      error: 'Too slow!',
+      data: { $value: 'Not JSON' },
     },
     meta: { ident: { id: 'johnf' } },
   }
