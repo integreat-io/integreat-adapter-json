@@ -8,6 +8,7 @@ import {
 import sendToService from './sendToService'
 
 const debug = debugFn('great:adapter:json')
+const debugHeaders = debugFn('great:adapter:json:headers')
 
 type Connection = Record<string, unknown>
 
@@ -125,6 +126,7 @@ const addAuthToUri = (
 const logRequest = (request: SendOptions, logger?: Logger) => {
   const message = `Sending ${request.method} ${request.uri}`
   debug('%s: %o', message, request.body)
+  debugHeaders('Headers: %o', request.headers)
   if (logger) {
     logger.info(message, request)
   }
