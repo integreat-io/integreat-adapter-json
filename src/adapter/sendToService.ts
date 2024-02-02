@@ -1,7 +1,7 @@
 import got, { HTTPError } from 'got'
 import { Response, SendOptions } from '.'
 
-const extractFromError = (error: HTTPError | Error) =>
+const extractFromError = (error: unknown) =>
   error instanceof HTTPError
     ? {
         statusCode: error.response.statusCode,
@@ -9,13 +9,10 @@ const extractFromError = (error: HTTPError | Error) =>
       }
     : {
         statusCode: undefined,
-        statusMessage: error.message,
+        statusMessage: error instanceof Error ? error.message : String(error),
       }
 
-async function handleError(
-  { uri, auth }: SendOptions,
-  error: HTTPError | Error
-) {
+async function handleError({ uri, auth }: SendOptions, error: unknown) {
   const { statusCode, statusMessage } = extractFromError(error)
   const response = {
     status: 'error',
