@@ -24,7 +24,7 @@ npm install integreat-adapter-json
 Example of use:
 
 ```javascript
-import integreat from 'integreat'
+import Integreat from 'integreat'
 import httpTransporter from 'integreat-transporter-http'
 import jsonAdapter from 'integreat-adapter-json'
 import defs from './config.js'

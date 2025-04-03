@@ -20,15 +20,15 @@
     }
   },
   "scripts": {
-    "test": "c8 --reporter=text-summary ava --config ./ava-dist.config.cjs",
-    "test:inspect": "node --inspect node_modules/ava/profile.js",
+    "test": "node --import tsx --test --enable-source-maps --experimental-test-coverage --test-reporter node-test-reporter 'src/**/*.test.ts'",
     "test:watch": "npm run dev",
-    "dev": "ava --watch",
+    "dev": "node --import tsx --test --enable-source-maps --test-reporter node-test-reporter --watch 'src/**/*.test.ts' || exit 0",
     "build": "tsc",
-    "prepublish": "npm run build",
-    "coverage": "c8 report",
+    "prepublishOnly": "npm run build",
     "lint": "eslint --ext .ts src",
-    "verify": "npm run lint && npm run build && npm test"
+    "format": "prettier src/**/*.ts *.md -w",
+    "typecheck": "tsc --noEmit --strict",
+    "verify": "npm run lint && npm run typecheck && npm test"
   },
   "repository": {
     "type": "git",
@@ -41,12 +41,12 @@
   "engines": {
     "node": ">= 18"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@integreat/ts-dev-setup": "^5.0.3",
-    "@types/sinon": "^17.0.1",
-    "integreat": "^1.4.6",
-    "nock": "^13.3.8",
-    "sinon": "^17.0.1"
+    "@integreat/ts-dev-setup": "^8.1.2",
+    "@types/node": "^22.14.0",
+    "@types/sinon": "^17.0.4",
+    "integreat": "^1.6.1",
+    "nock": "^14.0.2",
+    "sinon": "^20.0.0"
   }
 }
