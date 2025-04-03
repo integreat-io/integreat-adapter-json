@@ -1,4 +1,5 @@
-import test from 'ava'
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
 import adapter from './index.js'
 
@@ -8,27 +9,27 @@ const options = { includeHeaders: false }
 
 // Tests -- prepareOptions
 
-test('should prepare empty options', (t) => {
+test('should prepare empty options', () => {
   const options = {}
   const expected = { includeHeaders: true }
 
   const ret = adapter.prepareOptions(options, 'api')
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should only keep known options', (t) => {
+test('should only keep known options', () => {
   const options = { includeHeaders: false, dontKnow: 'whatthisis' }
   const expected = { includeHeaders: false }
 
   const ret = adapter.prepareOptions(options, 'api')
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
 // Tests -- normalize
 
-test('should normalize json string data in response', async (t) => {
+test('should normalize json string data in response', async () => {
   const action = {
     type: 'GET',
     payload: { type: 'entry' },
@@ -44,10 +45,10 @@ test('should normalize json string data in response', async (t) => {
 
   const ret = await adapter.normalize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should normalize json string data in payload', async (t) => {
+test('should normalize json string data in payload', async () => {
   const action = {
     type: 'SET',
     payload: {
@@ -69,10 +70,10 @@ test('should normalize json string data in payload', async (t) => {
 
   const ret = await adapter.normalize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should normalize empty json string as null', async (t) => {
+test('should normalize empty json string as null', async () => {
   const action = {
     type: 'GET',
     payload: { type: 'entry' },
@@ -88,10 +89,10 @@ test('should normalize empty json string as null', async (t) => {
 
   const ret = await adapter.normalize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should return error when parsing payload data fails', async (t) => {
+test('should return error when parsing payload data fails', async () => {
   const action = {
     type: 'GET',
     payload: { type: 'entry', data: 'Not JSON' },
@@ -110,10 +111,10 @@ test('should return error when parsing payload data fails', async (t) => {
 
   const ret = await adapter.normalize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should return error when parsing response data fails', async (t) => {
+test('should return error when parsing response data fails', async () => {
   const action = {
     type: 'GET',
     payload: { type: 'entry' },
@@ -133,10 +134,10 @@ test('should return error when parsing response data fails', async (t) => {
 
   const ret = await adapter.normalize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should not override existing error error with response data parsing error', async (t) => {
+test('should not override existing error error with response data parsing error', async () => {
   const action = {
     type: 'GET',
     payload: { type: 'entry' },
@@ -156,12 +157,12 @@ test('should not override existing error error with response data parsing error'
 
   const ret = await adapter.normalize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
 // Tests -- serialize
 
-test('should serialize data in response', async (t) => {
+test('should serialize data in response', async () => {
   const action = {
     type: 'GET',
     payload: { type: 'entry', sourceService: 'api' },
@@ -177,10 +178,10 @@ test('should serialize data in response', async (t) => {
 
   const ret = await adapter.serialize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should serialize data in payload', async (t) => {
+test('should serialize data in payload', async () => {
   const action = {
     type: 'SET',
     payload: {
@@ -200,10 +201,10 @@ test('should serialize data in payload', async (t) => {
 
   const ret = await adapter.serialize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should not serialize null or undefined', async (t) => {
+test('should not serialize null or undefined', async () => {
   const action = {
     type: 'GET',
     payload: { type: 'entry', data: null },
@@ -219,10 +220,10 @@ test('should not serialize null or undefined', async (t) => {
 
   const ret = await adapter.serialize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should include JSON headers in payload on outgoing service', async (t) => {
+test('should include JSON headers in payload on outgoing service', async () => {
   const options = {}
   const action = {
     type: 'GET',
@@ -245,10 +246,10 @@ test('should include JSON headers in payload on outgoing service', async (t) => 
 
   const ret = await adapter.serialize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should include JSON headers in resonse on incoming request', async (t) => {
+test('should include JSON headers in resonse on incoming request', async () => {
   const options = {}
   const action = {
     type: 'GET',
@@ -274,10 +275,10 @@ test('should include JSON headers in resonse on incoming request', async (t) => 
 
   const ret = await adapter.serialize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should include JSON headers in payload on outgoing service even when sourceService is set', async (t) => {
+test('should include JSON headers in payload on outgoing service even when sourceService is set', async () => {
   const options = {}
   const action = {
     type: 'GET',
@@ -305,10 +306,10 @@ test('should include JSON headers in payload on outgoing service even when sourc
 
   const ret = await adapter.serialize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should not replace existing content-type', async (t) => {
+test('should not replace existing content-type', async () => {
   const options = {}
   const action = {
     type: 'GET',
@@ -343,5 +344,5 @@ test('should not replace existing content-type', async (t) => {
 
   const ret = await adapter.serialize(action, options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
