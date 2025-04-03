@@ -6,7 +6,7 @@ import type { Action } from 'integreat'
 export function setErrorOnAction(
   action: Action,
   error: string,
-  status = 'error'
+  status = 'error',
 ): Action {
   return {
     ...action,

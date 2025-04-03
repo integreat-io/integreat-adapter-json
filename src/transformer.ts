@@ -7,7 +7,9 @@ function parse(data: unknown) {
   if (typeof data === 'string') {
     try {
       return JSON.parse(data)
-    } catch {}
+    } catch {
+      return undefined
+    }
   } else if (isParsed(data)) {
     return data
   }

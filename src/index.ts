@@ -40,15 +40,14 @@ const setActionData = (
   }),
 })
 
-function removeContentKeyWithWrongCase(
+const removeContentType = (
   headers: Record<string, string | string[] | undefined>,
-  key?: string,
-) {
-  if (typeof key === 'string' && key !== 'Content-Type') {
-    delete headers[key] // eslint-disable-line security/detect-object-injection
-  }
-  return headers
-}
+) =>
+  Object.fromEntries(
+    Object.entries(headers).filter(
+      ([key]) => key.toLowerCase() !== 'content-type',
+    ),
+  )
 
 function setContentType(
   defaultType: string,
@@ -59,10 +58,7 @@ function setContentType(
   )
   const contentType =
     (typeof contentKey === 'string' && headers[contentKey]) || defaultType // eslint-disable-line security/detect-object-injection
-  return removeContentKeyWithWrongCase(
-    { ...headers, 'Content-Type': contentType },
-    contentKey,
-  )
+  return { ...removeContentType(headers), 'Content-Type': contentType }
 }
 
 // Set on headers on payload for outgoing action, and on response for incoming
