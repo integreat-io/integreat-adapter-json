@@ -1,119 +1,135 @@
-import test from 'ava'
-import { compile as compileUri } from 'great-uri-template'
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import greatUriTemplate from 'great-uri-template'
 
-import json from '.'
+import json from './index.js'
+
+// Setup
+
 const adapter = json()
 
-test('should return endpoint object', (t) => {
+// Tests
+
+test('should return endpoint object', () => {
   const options = {
     uri: 'http://example.com/',
     headers: {
-      'If-Match': '3-871801934'
+      'If-Match': '3-871801934',
     },
-    method: 'POST' as const
+    method: 'POST' as const,
   }
   const expected = {
     uri: ['http://example.com/'],
     headers: {
-      'If-Match': '3-871801934'
+      'If-Match': '3-871801934',
     },
-    method: 'POST' as const
+    method: 'POST' as const,
   }
 
   const ret = adapter.prepareEndpoint(options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should merge service options and endpoint options', (t) => {
+test('should merge service options and endpoint options', () => {
   const options = {
     uri: 'http://example.com/',
-    fromEndpoint: '1'
+    fromEndpoint: '1',
   }
   const serviceOptions = {
-    baseUri: null
+    baseUri: null,
   }
   const expected = {
     uri: ['http://example.com/'],
     fromEndpoint: '1',
-    baseUri: null
+    baseUri: null,
   }
 
   const ret = adapter.prepareEndpoint(options, serviceOptions)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should set uri to undefined when missing', (t) => {
+test('should set uri to undefined when missing', () => {
   const options = {}
   const expected = {
-    uri: undefined
+    uri: undefined,
   }
 
   const ret = adapter.prepareEndpoint(options)
 
-  t.deepEqual(ret, expected)
+  assert.deepEqual(ret, expected)
 })
 
-test('should compile uri', (t) => {
+test('should compile uri', () => {
   const uri = 'http://example.com/{type}/{id}{?first,max}'
   const options = { uri }
-  const expected = compileUri(uri)
+  const expected = greatUriTemplate.compile(uri)
 
   const ret = adapter.prepareEndpoint(options)
 
-  t.truthy(ret)
-  t.deepEqual(ret.uri, expected)
+  assert.ok(ret)
+  assert.deepEqual(ret.uri, expected)
 })
 
-test('should use baseUri from service options', (t) => {
+test('should use baseUri from service options', () => {
   const serviceOptions = { baseUri: 'http://example.com/' }
   const options = { uri: '{type}/{id}{?first,max}' }
-  const expected = compileUri('http://example.com/{type}/{id}{?first,max}')
+  const expected = greatUriTemplate.compile(
+    'http://example.com/{type}/{id}{?first,max}',
+  )
 
   const ret = adapter.prepareEndpoint(options, serviceOptions)
 
-  t.deepEqual(ret.uri, expected)
+  assert.deepEqual(ret.uri, expected)
 })
 
-test('should remove extra slash from baseUri and uri', (t) => {
+test('should remove extra slash from baseUri and uri', () => {
   const serviceOptions = { baseUri: 'http://example.com/' }
   const options = { uri: '/{type}/{id}{?first,max}' }
-  const expected = compileUri('http://example.com/{type}/{id}{?first,max}')
+  const expected = greatUriTemplate.compile(
+    'http://example.com/{type}/{id}{?first,max}',
+  )
 
   const ret = adapter.prepareEndpoint(options, serviceOptions)
 
-  t.deepEqual(ret.uri, expected)
+  assert.deepEqual(ret.uri, expected)
 })
 
-test('should add missing slash between baseUri and uri', (t) => {
+test('should add missing slash between baseUri and uri', () => {
   const serviceOptions = { baseUri: 'http://example.com' }
   const options = { uri: '{type}/{id}{?first,max}' }
-  const expected = compileUri('http://example.com/{type}/{id}{?first,max}')
+  const expected = greatUriTemplate.compile(
+    'http://example.com/{type}/{id}{?first,max}',
+  )
 
   const ret = adapter.prepareEndpoint(options, serviceOptions)
 
-  t.deepEqual(ret.uri, expected)
+  assert.deepEqual(ret.uri, expected)
 })
 
-test('should not prepend unset baseUri', (t) => {
+test('should not prepend unset baseUri', () => {
   const serviceOptions = {}
   const options = { uri: 'http://example.com/{type}/{id}{?first,max}' }
-  const expected = compileUri('http://example.com/{type}/{id}{?first,max}')
+  const expected = greatUriTemplate.compile(
+    'http://example.com/{type}/{id}{?first,max}',
+  )
 
   const ret = adapter.prepareEndpoint(options, serviceOptions)
 
-  t.truthy(ret)
-  t.deepEqual(ret.uri, expected)
+  assert.ok(ret)
+  assert.deepEqual(ret.uri, expected)
 })
 
-test('should not prepend with baseUri when null', (t) => {
+test('should not prepend with baseUri when null', () => {
   const serviceOptions = { baseUri: null }
   const options = { uri: 'http://example.com/{type}/{id}{?first,max}' }
-  const expected = compileUri('http://example.com/{type}/{id}{?first,max}')
+  const expected = greatUriTemplate.compile(
+    'http://example.com/{type}/{id}{?first,max}',
+  )
 
   const ret = adapter.prepareEndpoint(options, serviceOptions)
 
-  t.truthy(ret)
-  t.deepEqual(ret.uri, expected)
+  assert.ok(ret)
+  assert.deepEqual(ret.uri, expected)
 })

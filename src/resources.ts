@@ -1,10 +1,9 @@
-import adapter from './adapter'
+import adapter from './adapter/index.js'
 
 const adapters = {
-  json: adapter()
+  json: adapter(),
 }
 
-export = {
+export default {
   adapters,
-  default: { adapters }
 }

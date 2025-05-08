@@ -1,6 +1,5 @@
-import adapter, { Logger } from './adapter'
+import adapter, { Logger } from './adapter/index.js'
 
-export = Object.assign(
-  (logger?: Logger) => adapter(logger),
-  { default: adapter }
-)
+export default Object.assign((logger?: Logger) => adapter(logger), {
+  default: adapter,
+})

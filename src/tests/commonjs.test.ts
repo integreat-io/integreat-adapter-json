@@ -1,8 +1,9 @@
-import test from 'ava'
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
-import adapter = require('..')
+import adapter from '../index.js'
 
-test('should be adapter', (t) => {
-  t.is(typeof adapter(), 'object')
-  t.is(typeof adapter().send, 'function')
+test('should be adapter', () => {
+  assert.equal(typeof adapter(), 'object')
+  assert.equal(typeof adapter().send, 'function')
 })

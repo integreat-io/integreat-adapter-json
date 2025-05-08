@@ -1,16 +1,10 @@
-import test from 'ava'
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
-import defaultResources from '../resources'
-import commonResources = require('../resources')
+import resources from '../resources.js'
 
-test('should have json adapter on default', (t) => {
-  t.is(typeof defaultResources, 'object')
-  t.is(typeof defaultResources.adapters.json, 'object')
-  t.is(typeof defaultResources.adapters.json.send, 'function')
-})
-
-test('should have json adapter as commonjs', (t) => {
-  t.is(typeof commonResources, 'object')
-  t.is(typeof commonResources.adapters.json, 'object')
-  t.is(typeof commonResources.adapters.json.send, 'function')
+test('should have json adapter as commonjs', () => {
+  assert.equal(typeof resources, 'object')
+  assert.equal(typeof resources.adapters.json, 'object')
+  assert.equal(typeof resources.adapters.json.send, 'function')
 })

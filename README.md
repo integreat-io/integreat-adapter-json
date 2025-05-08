@@ -4,17 +4,11 @@ Adapter that lets
 [Integreat](https://github.com/integreat-io/integreat) send and receive content
 in JSON.
 
-[![npm Version](https://img.shields.io/npm/v/integreat-adapter-json.svg)](https://www.npmjs.com/package/integreat-adapter-json)
-[![Build Status](https://travis-ci.org/integreat-io/integreat-adapter-json.svg?branch=master)](https://travis-ci.org/integreat-io/integreat-adapter-json)
-[![Coverage Status](https://coveralls.io/repos/github/integreat-io/integreat-adapter-json/badge.svg?branch=master)](https://coveralls.io/github/integreat-io/integreat-adapter-json?branch=master)
-[![Dependencies Status](https://tidelift.com/badges/github/integreat-io/integreat-adapter-json?style=flat)](https://tidelift.com/repo/github/integreat-io/integreat-adapter-json)
-[![Maintainability](https://api.codeclimate.com/v1/badges/95c9ac1d21d1ab2424ac/maintainability)](https://codeclimate.com/github/integreat-io/integreat-adapter-json/maintainability)
-
 ## Getting started
 
 ### Prerequisits
 
-Requires node v8.6 and Integreat v0.7.
+Requires node v20 and Integreat v0.7.
 
 ### Installing and using
 
@@ -27,9 +21,9 @@ npm install integreat-adapter-json
 Example of use:
 
 ```javascript
-const integreat = require('integreat')
-const jsonAdapter = require('integreat-adapter-json')
-const defs = require('./config')
+import integreat from 'integreat'
+import jsonAdapter from 'integreat-adapter-json'
+import defs from './config'
 
 const resources = integreat.mergeResources(integreat.resources(), {
   adapters: { json: jsonAdapter() },

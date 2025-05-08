@@ -1,5 +1,5 @@
 import got, { HTTPError } from 'got'
-import { Response, SendOptions } from '.'
+import type { Response, SendOptions } from './index.js'
 
 const extractFromError = (error: unknown) =>
   error instanceof HTTPError
@@ -46,7 +46,7 @@ async function handleError({ uri, auth }: SendOptions, error: unknown) {
 }
 
 export default async function sendToService(
-  sendOptions: SendOptions
+  sendOptions: SendOptions,
 ): Promise<Response> {
   const { uri, method, body, headers, retries, timeout } = sendOptions
 
@@ -55,8 +55,8 @@ export default async function sendToService(
       method,
       body,
       headers,
-      retry: retries,
-      timeout,
+      retry: { limit: retries },
+      timeout: { request: timeout },
     })
     return {
       status: 'ok',

@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import debugFn = require('debug')
-import { Method } from 'got'
-import {
-  compile as compileUri,
-  generate as generateUri,
-} from 'great-uri-template'
-import sendToService from './sendToService'
+import debugFn from 'debug'
+import greatUriTemplate, { CompiledTemplate } from 'great-uri-template'
+import sendToService from './sendToService.js'
+import type { Method } from 'got'
 
 const debug = debugFn('great:adapter:json')
 const debugHeaders = debugFn('great:adapter:json:headers')
@@ -14,15 +10,11 @@ type Connection = Record<string, unknown>
 
 type DataProperty = string | number | boolean | Record<string, unknown>
 
-interface Data {
-  [key: string]: DataProperty
-}
+type Data = Record<string, DataProperty>
 
 export type RequestData = Data | Data[] | DataProperty | null
 
-interface Params {
-  [key: string]: DataProperty
-}
+type Params = Record<string, DataProperty>
 
 export type Headers = Record<string, string>
 
@@ -55,7 +47,7 @@ export interface Options {
 
 export interface CompiledOptions {
   baseUri?: string | null
-  uri?: (string | Record<string, unknown>)[]
+  uri?: CompiledTemplate | null
   headers?: Headers
   method?: Method
   retries?: number
@@ -89,7 +81,7 @@ const createHeaders = (
   endpoint: CompiledOptions,
   hasData: boolean,
   headers?: Headers,
-  auth?: Record<string, unknown> | boolean | null
+  auth?: Record<string, unknown> | boolean | null,
 ) => ({
   'user-agent': 'integreat-adapter-json/0.4',
   ...(hasData ? { 'Content-Type': 'application/json' } : {}),
@@ -101,8 +93,8 @@ const createHeaders = (
 const createQueryString = (params: Params) =>
   Object.keys(params)
     .map(
-      // eslint-disable-next-line security/detect-object-injection
-      (key) => `${key.toLowerCase()}=${encodeURIComponent(String(params[key]))}`
+      (key) =>
+        `${key.toLowerCase()}=${encodeURIComponent(String(params[key]))}`, // eslint-disable-line security/detect-object-injection
     )
     .join('&')
 
@@ -115,7 +107,7 @@ const removeDanglingQuestionMark = (uri: string) =>
 const addAuthToUri = (
   uri: string,
   endpoint: CompiledOptions,
-  auth?: Record<string, string | number> | boolean | null
+  auth?: Record<string, string | number> | boolean | null,
 ) => {
   if (uri && endpoint.authAsQuery === true && auth && auth !== true) {
     return appendQueryParams(removeDanglingQuestionMark(uri), auth)
@@ -135,7 +127,7 @@ const logRequest = (request: SendOptions, logger?: Logger) => {
 const logResponse = (
   response: Response,
   { uri, method }: SendOptions,
-  logger?: Logger
+  logger?: Logger,
 ) => {
   const { status, error } = response
   const message =
@@ -155,7 +147,7 @@ const logResponse = (
 function joinUris(baseUri?: string | null, uri?: string) {
   if (baseUri && uri) {
     if (baseUri.endsWith('/') && uri.startsWith('/')) {
-      return baseUri + uri.substr(1)
+      return baseUri + uri.slice(1)
     } else if (!baseUri.endsWith('/') && !uri.startsWith('/')) {
       return baseUri + '/' + uri
     } else {
@@ -174,7 +166,10 @@ export default (logger?: Logger) => ({
    * The endpoint options are only used by the adapter.
    * Might also be given service options, which are also adapter specific.
    */
-  prepareEndpoint(endpointOptions: Options, serviceOptions?: Options) {
+  prepareEndpoint(
+    endpointOptions: Options,
+    serviceOptions?: Options,
+  ): CompiledOptions {
     const options = { ...serviceOptions, ...endpointOptions }
     const { uri: uriTemplate, baseUri } = options
 
@@ -182,7 +177,7 @@ export default (logger?: Logger) => ({
 
     return {
       ...options,
-      uri: uri ? compileUri(uri) : undefined,
+      uri: uri ? greatUriTemplate.compile(uri) : undefined,
     }
   },
 
@@ -194,7 +189,7 @@ export default (logger?: Logger) => ({
   connect: async (
     _serviceOptions: Options,
     _auth: Record<string, unknown> | null,
-    connection: Connection | null
+    connection: Connection | null,
   ) => connection,
 
   /**
@@ -219,7 +214,7 @@ export default (logger?: Logger) => ({
    */
   async send(
     { endpoint, data, auth, params = {}, headers: reqHeaders }: Request,
-    _connection?: Connection | null
+    _connection?: Connection | null,
   ): Promise<Response> {
     if (!endpoint || !endpoint.uri) {
       return { status: 'error', error: 'No endpoint specified in the request' }
@@ -234,9 +229,9 @@ export default (logger?: Logger) => ({
     }
 
     const uri = addAuthToUri(
-      generateUri(endpoint.uri, { ...endpoint, ...params }),
+      greatUriTemplate.generate(endpoint.uri, { ...endpoint, ...params }),
       endpoint,
-      auth
+      auth,
     )
     const method = selectMethod(endpoint, data)
     const retries = endpoint.retries ?? 0
@@ -245,7 +240,7 @@ export default (logger?: Logger) => ({
       endpoint,
       data !== undefined,
       reqHeaders,
-      auth
+      auth,
     )
 
     const request = { uri, method, body: data, headers, retries, timeout }

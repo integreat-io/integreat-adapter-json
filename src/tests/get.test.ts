@@ -1,9 +1,12 @@
-import test from 'ava'
-import nock = require('nock')
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import nock from 'nock'
 
-import adapter from '..'
+import adapter from '../index.js'
 
-test('should prepare, serialize, send, and normalize', async (t) => {
+// Tests
+
+test('should prepare, serialize, send, and normalize', async () => {
   const json = adapter()
   const scope = nock('http://json1.test')
     .get('/entries/ent1')
@@ -23,8 +26,8 @@ test('should prepare, serialize, send, and normalize', async (t) => {
   const response = await json.send(serialized)
   const normalized = await json.normalize(response, serialized)
 
-  t.deepEqual(normalized, expected)
-  t.true(scope.isDone())
+  assert.deepEqual(normalized, expected)
+  assert.ok(scope.isDone())
 
   nock.restore()
 })
