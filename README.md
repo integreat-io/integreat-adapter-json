@@ -1,11 +1,10 @@
 # JSON adapter for Integreat
 
 Adapter that lets
-[Integreat](https://github.com/integreat-io/integreat) send and receive content
-in JSON.
+[Integreat](https://github.com/integreat-io/integreat) parse and stringify JSON.
 
 [![npm Version](https://img.shields.io/npm/v/integreat-adapter-json.svg)](https://www.npmjs.com/package/integreat-adapter-json)
-[![Maintainability](https://api.codeclimate.com/v1/badges/95c9ac1d21d1ab2424ac/maintainability)](https://codeclimate.com/github/integreat-io/integreat-adapter-json/maintainability)
+[![Maintainability](https://qlty.sh/gh/integreat-io/projects/integreat-adapter-json/maintainability.svg)](https://qlty.sh/gh/integreat-io/projects/integreat-adapter-json)
 
 ## Getting started
 
