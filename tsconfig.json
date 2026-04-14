@@ -15,14 +15,12 @@
     "strictNullChecks": true,
     "noImplicitReturns": true,
     "alwaysStrict": true,
+    "types": ["node"],
     "skipLibCheck": true,
     "removeComments": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "*": ["node_modules/*"]
-    },
-    "outDir": "./dist"
+    "rootDir": "./src",
+    "outDir": "./dist",
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
 }

@@ -38,17 +38,17 @@
     "node": ">= 20"
   },
   "dependencies": {
-    "debug": "^4.4.0",
-    "got": "^14.4.7",
+    "debug": "^4.4.3",
+    "got": "^14.6.6",
     "great-uri-template": "^0.2.4"
   },
   "devDependencies": {
-    "@integreat/ts-dev-setup": "^8.1.2",
-    "@types/debug": "^4.1.12",
+    "@integreat/ts-dev-setup": "^9.0.0",
+    "@types/debug": "^4.1.13",
     "@types/got": "^9.6.12",
-    "@types/node": "^22.15.17",
-    "@types/sinon": "^17.0.4",
-    "nock": "^14.0.4",
-    "sinon": "^20.0.0"
+    "@types/node": "^25.6.0",
+    "@types/sinon": "^21.0.1",
+    "nock": "^14.0.12",
+    "sinon": "^21.1.2"
   }
 }
