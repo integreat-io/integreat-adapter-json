@@ -43,11 +43,11 @@
     "node": ">= 18"
   },
   "devDependencies": {
-    "@integreat/ts-dev-setup": "^8.2.0",
-    "@types/node": "^24.0.14",
-    "@types/sinon": "^17.0.4",
-    "integreat": "^1.6.3",
-    "nock": "^14.0.5",
-    "sinon": "^21.0.0"
+    "@integreat/ts-dev-setup": "^9.0.0",
+    "@types/node": "^25.6.0",
+    "@types/sinon": "^21.0.1",
+    "integreat": "^1.6.5",
+    "nock": "^14.0.12",
+    "sinon": "^21.1.2"
   }
 }
